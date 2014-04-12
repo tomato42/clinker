@@ -20,6 +20,8 @@ var clinkerCryptoEstimator = function() {
     this.bulkCipher = "Unknown";
     // mechanism used to provide integrity of transmitted data
     this.integrity = null;
+    // level of security of used integrity mechanism
+    this.integrityLoS = null;
     // pseudo random function, used to generate keying material
     this.prf = null;
     // RSA, ECDSA or DSA
@@ -39,26 +41,32 @@ clinkerCryptoEstimator.prototype.setKeyExchange = function(val) {
 clinkerCryptoEstimator.prototype.setBulkCipher = function(val) {
     this.bulkCipher = val;
 }
+clinkerCryptoEstimator.prototype.rsaLoSEstimator = function(val) {
+    var keyLoS;
+
+    // the difference in complexity of attack on RSA primes of
+    // n and n-10 bit size are minimal and certificates that use
+    // nonstandard sizes are quite common, so average the sizes
+    if (size < 1020) { // 1024 == 80 bit
+        keyLoS = 64;
+    } else if (size < 2040) { // 2048 == 112 bit
+        keyLoS = 80;
+    } else if (size < 3068) { // 3072 == 128 bit
+        keyLoS = 112;
+    } else if (size < 7660) { // 7680 == 192 bit
+        keyLoS = 128;
+    } else if (size < 15300) { // 15360 == 256 bit
+        keyLoS = 192;
+    } else {
+        keyLoS = 256;
+    }
+    return keyLoS;
+}
 clinkerCryptoEstimator.prototype.addCertKey = function(type, size) {
     if (type == "ECDSA") {
         keyLoS = size / 2;
     } else if (type == "RSA") {
-        // the difference in complexity of attack on RSA primes of
-        // n and n-10 bit size are minimal and certificates that use
-        // nonstandard sizes are quite common, so average the sizes
-        if (size < 1020) { // 1024 == 80 bit
-            keyLoS = 64;
-        } else if (size < 2040) { // 2048 == 112 bit
-            keyLoS = 80;
-        } else if (size < 3068) { // 3072 == 128 bit
-            keyLos = 112;
-        } else if (size < 7660) { // 7680 == 192 bit
-            keyLos = 128;
-        } else if (size < 15300) { // 15360 == 256 bit
-            keyLos = 192;
-        } else {
-            keyLos = 256;
-        }
+        keyLoS = this.rsaLoSEstimator(size);
     } else {
         alert("Clinker: Unknown certificate type: ".concat(type));
         return;
@@ -71,6 +79,10 @@ clinkerCryptoEstimator.prototype.setServerKey = function(type, size) {
     this.serverKeyType = type;
     this.serverKeySize = size;
     this.addCertKey(type, size);
+}
+clinkerCryptoEstimator.prototype.setIntegrityMechanism = function(type, los) {
+    this.integrity = type;
+    this.integrityLoS = los;
 }
 // return estimated level of security for used bulk cipher
 clinkerCryptoEstimator.prototype.getCipherLoS = function() {
@@ -87,6 +99,38 @@ clinkerCryptoEstimator.prototype.getCipherLoS = function() {
         return 32;
     }
     return 0;
+}
+// estimate the long term security of transmitted data
+clinkerCryptoEstimator.prototype.getEncryptionLoS = function() {
+    var minLoS = null;
+/*
+    if ( this.isKeyExchangeForwardSecure ) {
+        // should be the LoS of the DH exchange, but no API yet
+        // so assume it's not a weak point (it requires a targeted
+        // attack anyway)
+        // TODO open a RFE on bugzilla
+        minLos = 256;
+    } else {
+        if (this.serverKeyType == "RSA" ||
+                this.serverKeyType == "DSA") {
+            minLoS = this.rsaLoSEstimator(this.serverKeySize);
+        } else if (this.serverKeyType == "ECDSA") {
+            minLoS = this.serverKeySize / 2;
+        }
+    }
+*/
+    cipherLoS = this.getCipherLoS();
+    if (minLoS == null || minLoS > cipherLoS) {
+        minLoS = cipherLoS;
+    }
+/*
+    if (this.integrity != "AEAD") {
+        if (minLoS > this.integrityLoS) {
+            minLoS = this.integrityLoS;
+        }
+    }
+*/
+    return minLoS;
 }
 clinkerCryptoEstimator.prototype.getEncryptionCipher = function() {
     return this.bulkCipher;
@@ -832,7 +876,7 @@ var clinker = {
           clinker._clinkerPopupContentBulkCipher.textContent =
               ("Bulk Cipher : ").concat(cipher_name).concat(" (").concat(cipher_los).concat(" bit)");
 
-          // grade the a Message Authentication Code (MAC)
+          // save the integrity mechanism
           if ( symetricCipher.contains("_GCM_SHA256") ) {
           clinker._clinkerPopupContentMAC.textContent         =  ("MAC         : SHA-256 AEAD GCM (20/20)");
           clinker_conn_score += 20;
@@ -871,6 +915,20 @@ var clinker = {
          clinker._clinkerPopupContentSecure.textContent = ("Security   : " + "WARNING! Very Weak (red " + clinker_conn_score + "%)");
          document.getElementById("clinker-urlicon").image="chrome://clinker/skin/clinker_red_button.png";
        }
+
+       var longTerm = estimator.getEncryptionLoS();
+       var encryptionComment;
+       if (longTerm < 80) {
+           encryptionComment = "(Broken)";
+       } else if (longTerm < 112) {
+           encryptionComment = "(insecure)";
+       } else if (longTerm < 128) {
+           encryptionComment = "(secure until around 20XX)";
+       } else {
+           encryptionComment = "(secure for forseeable future)";
+       }
+
+       clinker._clinkerPopupContentSecure.textContent = ("Confidentiality : ").concat(longTerm).concat(" bit ").concat(encryptionComment);
 
        // if the ssl connection is just plain broke
        if (ui.state & ci.nsIWebProgressListener.STATE_IS_INSECURE || ui.state & ci.nsIWebProgressListener.STATE_IS_BROKEN) {
