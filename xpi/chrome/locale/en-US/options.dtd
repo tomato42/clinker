@@ -1,5 +1,5 @@
-<!ENTITY prefwindow.title "Calomel SSL Validation preferences">
-<!ENTITY pane1.title "Calomel SSL Validation preferences">
+<!ENTITY prefwindow.title "Clinker SSL Validation preferences">
+<!ENTITY pane1.title "Clinker SSL Validation preferences">
 <!ENTITY options.description_top "">
 <!ENTITY ciphers_256pfs_pref.label "256 bit Perfect Forward Secrecy and GCM ciphers">
 <!ENTITY ciphers_128pfs_pref.label "128 bit Perfect Forward Secrecy and stronger">

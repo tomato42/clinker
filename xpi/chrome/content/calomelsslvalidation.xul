@@ -62,7 +62,7 @@
    	  <description id="calomelsslvalidation-popup-content-before-date"/>
    	  <description id="calomelsslvalidation-popup-content-after-date"/>
    	  <description id="calomelsslvalidation-popup-content-current-date"/>
-          <menuitem id="calomelsslvalidation-calomel_ssl_validation_homepage" oncommand="calomelsslvalidation.openHomePageLink(event)" onclick="checkForMiddleClick(this, event)" label="by Calomel @ https://calomel.org"/>
+          <menuitem id="calomelsslvalidation-calomel_ssl_validation_homepage" oncommand="calomelsslvalidation.openHomePageLink(event)" onclick="checkForMiddleClick(this, event)" label="by Tomato42"/>
         </vbox>
       </hbox>
     </panel>

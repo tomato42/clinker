@@ -350,7 +350,7 @@ var calomelsslvalidation = {
 
   // open a link to our home page
   openHomePageLink: function(event) {
-    openUILink("https://calomel.org/firefox_ssl_validation.html", event, false, true);
+    openUILink("https://github.com/tomato42/clinker", event, false, true);
   },
 
   //
@@ -471,7 +471,7 @@ var calomelsslvalidation = {
      var calomel_prefHomeOnUpdate = prefs.getBoolPref("extensions.calomelsslvalidation.home_on_update");
      var calomel_prefVersion = prefs.getIntPref("extensions.calomelsslvalidation.version");
      if (calomel_prefHomeOnUpdate && calomel_prefVersion < calomelsslvalidation_current_version) {
-       gBrowser.addTab("https://calomel.org/firefox_ssl_validation.html");
+       gBrowser.addTab("https://github.com/tomato42/clinker");
        prefs.setIntPref("extensions.calomelsslvalidation.version", calomelsslvalidation_current_version);
      }
 

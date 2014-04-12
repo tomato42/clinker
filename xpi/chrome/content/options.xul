@@ -28,7 +28,7 @@
       <preference id="send_referer_pref" name="extensions.calomelsslvalidation.send_referer" type="bool"/>
       <preference id="user_agent_pref" name="extensions.calomelsslvalidation.user_agent" type="bool"/>
     </preferences>
-    <image src="chrome://calomelsslvalidation/skin/calomelsslvalidation_menu_top.png" validate="never" />
+    <!--    <image src="chrome://calomelsslvalidation/skin/calomelsslvalidation_menu_top.png" validate="never" /> -->
     <description flex="1" style="min-height: 2em"> &options.description_top; </description>
     <tabbox>
      <tabs>
@@ -71,11 +71,12 @@
          <checkbox id="dns_cache_check" preference="dns_cache_pref" label="&dns_cache_pref.label;"/>
        </tabpanel>
        <tabpanel id="abouttab" orient="vertical">
-         <description>Calomel SSL Validation</description>
+         <description>Clinker SSL Validation</description>
          <spacer style="min-height: 1em;" />
          <checkbox id="home_on_update_check" preference="home_on_update_pref" label="&home_on_update_pref.label;"/>
          <spacer style="min-height: 1em;" />
-         <description>by Calomel @ https://calomel.org</description>
+         <description>by Tomato42, source, manual and bug tracker available at https://github.com/tomato42/clinker</description>
+         <description>fork of Calomel SSL Validator by Calomel.org https://calomel.org</description>
        </tabpanel>
      </tabpanels>
     </tabbox>
