@@ -456,8 +456,8 @@ var clinker = {
    onPageUpdate: function() {
 
      // CURRENT VERSION
-     const clinker_current_version = 70;
-     const clinker_current_greeting = "version 0.70";
+     const clinker_current_version = 1;
+     const clinker_current_greeting = "version 0.0.1";
 
      // global constants
      const cc = Components.classes;
