@@ -7,6 +7,104 @@
  *    https://calomel.org
  */
 
+/*
+ * class used to estimate the overall security of connection
+ */
+var clinkerCryptoEstimator = function() {
+    // key exchange algorithm used in TLS
+    this.kex = null;
+    // server certificate authentication mechanism (how identity of server is
+    // certified)
+    this.authentication = null;
+    // bulk cipher used to provide secrecy
+    this.bulkCipher = "Unknown";
+    // mechanism used to provide integrity of transmitted data
+    this.integrity = null;
+    // pseudo random function, used to generate keying material
+    this.prf = null;
+    // RSA, ECDSA or DSA
+    this.serverKeyType = null;
+    // length of public key used by server
+    this.serverKeySize = null;
+    // in case of ECDSA: name of curve used
+    this.serverCurveName = null;
+    // lowest level of security of keys in cert chain
+    this.lowestCertKeyLoS = null;
+    // weakest algorithm type used in certificates (MD5, SHA-1, SHA-256, etc.)
+    this.weakestSigType = null;
+}
+clinkerCryptoEstimator.prototype.setKeyExchange = function(val) {
+    this.kex = val;
+}
+clinkerCryptoEstimator.prototype.setBulkCipher = function(val) {
+    this.bulkCipher = val;
+}
+clinkerCryptoEstimator.prototype.addCertKey = function(type, size) {
+    if (type == "ECDSA") {
+        keyLoS = size / 2;
+    } else if (type == "RSA") {
+        // the difference in complexity of attack on RSA primes of
+        // n and n-10 bit size are minimal and certificates that use
+        // nonstandard sizes are quite common, so average the sizes
+        if (size < 1020) { // 1024 == 80 bit
+            keyLoS = 64;
+        } else if (size < 2040) { // 2048 == 112 bit
+            keyLoS = 80;
+        } else if (size < 3068) { // 3072 == 128 bit
+            keyLos = 112;
+        } else if (size < 7660) { // 7680 == 192 bit
+            keyLos = 128;
+        } else if (size < 15300) { // 15360 == 256 bit
+            keyLos = 192;
+        } else {
+            keyLos = 256;
+        }
+    } else {
+        alert("Clinker: Unknown certificate type: ".concat(type));
+        return;
+    }
+    if (this.lowestCertKeyLoS == null || this.lowestCertKeyLoS > keyLoS) {
+        this.lowestCertKeyLoS = keyLos;
+    }
+}
+clinkerCryptoEstimator.prototype.setServerKey = function(type, size) {
+    this.serverKeyType = type;
+    this.serverKeySize = size;
+    this.addCertKey(type, size);
+}
+// return estimated level of security for used bulk cipher
+clinkerCryptoEstimator.prototype.getCipherLoS = function() {
+    // AES and Camellia have no known significant weaknesses
+    if ( this.bulkCipher == "AES-128" || this.bulkCipher == "CAMELLIA-128" ) {
+        return 128;
+    } else if ( this.bulkCipher == "AES-256" || this.bulkCipher == "CAMELLIA-256" ) {
+        return 256;
+    } else if ( this.bulkCipher == "3DES" ) {
+        // because of meet in the middle, the security is reduced from 168 bits
+        return 112;
+    } else if ( this.bulkCipher == "RC4" ) {
+        // because of biases in output, the security is reduced from 128 bits
+        return 32;
+    }
+    return 0;
+}
+clinkerCryptoEstimator.prototype.getEncryptionCipher = function() {
+    return this.bulkCipher;
+}
+clinkerCryptoEstimator.prototype.isKeyExchangeForwardSecure = function() {
+    if (this.kex == "ECDHE" || this.kex == "DHE") {
+        return true;
+    }
+    return false;
+}
+clinkerCryptoEstimator.prototype.isRecommendedPractice = function() {
+    if (this.integrity == "AEAD" && this.getCipherLoS() >= 128 &&
+            this.getAuthenticationLoS() >= 128) {
+        return true;
+    }
+    return false;
+}
+
 var clinker = {
 
   startFirefox: function() {
@@ -470,7 +568,8 @@ var clinker = {
      var clinker_url_protocol = window.content.location.protocol;
      var clinker_conn_score = 0;
      var clinker_prefTabTitle = prefs.getBoolPref("extensions.clinker.tab_title");
-   
+     var estimator = new clinkerCryptoEstimator();
+
      // open the clinker help page on update or install
      var clinker_prefHomeOnUpdate = prefs.getBoolPref("extensions.clinker.home_on_update");
      var clinker_prefVersion = prefs.getIntPref("extensions.clinker.version");
@@ -670,58 +769,68 @@ var clinker = {
 
           // grade the key exchange
           if ( symetricCipher.contains("TLS_ECDHE_") ) {
+              estimator.setKeyExchange("ECDHE");
           clinker._clinkerPopupContentPfs.textContent         =  ("\nPerfect Forward Secrecy [PFS]:  YES  (20/20)");
           clinker._clinkerPopupContentKeyExchange.textContent =  ("Key Exchange: ECDHE [PFS]      (25/25)");
           clinker_conn_score += 45;
           } else if ( symetricCipher.contains("TLS_DHE_") ) {
+              estimator.setKeyExchange("DHE");
           clinker._clinkerPopupContentPfs.textContent         =  ("\nPerfect Forward Secrecy [PFS]:  YES  (20/20)");
           clinker._clinkerPopupContentKeyExchange.textContent =  ("Key Exchange: DHE [PFS]        (20/25)");
           clinker_conn_score += 40;
           } else if ( symetricCipher.contains("TLS_ECDH_") ) {
+              estimator.setKeyExchange("ECDH");
           clinker._clinkerPopupContentKeyExchange.textContent =  ("Key Exchange: ECDH             (10/25)");
           clinker_conn_score += 10;
           } else if ( symetricCipher.contains("TLS_DH_") ) {
+              estimator.setKeyExchange("DH");
           clinker._clinkerPopupContentKeyExchange.textContent =  ("Key Exchange: DH               ( 7/25)");
           clinker_conn_score += 7;
           } else if ( symetricCipher.contains("TLS_RSA_WITH_") ) {
+              estimator.setKeyExchange("RSA");
           clinker._clinkerPopupContentKeyExchange.textContent =  ("Key Exchange: RSA/server key   ( 3/25)");
           clinker_conn_score += 3;
           } else if ( symetricCipher.contains("SSL_RSA_WITH_") ) {
+              estimator.setKeyExchange("RSA");
           clinker._clinkerPopupContentKeyExchange.textContent =  ("Key Exchange: RSA/server key   ( 1/25)");
           clinker_conn_score += 1;
           }
 
           // grade the signature
           if ( symetricCipher.contains("_ECDSA_WITH_") ) {
-          clinker._clinkerPopupContentSignature.textContent   =  ("Signature   : ECDSA");
-       // clinker._clinkerPopupContentSignature.textContent   =  ("Signature   : ECDSA            (13/13)");
-       // clinker_conn_score += 13;
+              clinker._clinkerPopupContentSignature.textContent   =  ("Signature   : ECDSA");
           } else if ( symetricCipher.contains("_RSA_WITH_") ) {
-          clinker._clinkerPopupContentSignature.textContent   =  ("Signature   : RSA");
-       // clinker._clinkerPopupContentSignature.textContent   =  ("Signature   : RSA              (10/13)");
-       // clinker_conn_score += 10;
+              clinker._clinkerPopupContentSignature.textContent   =  ("Signature   : RSA");
+          } else if ( symetricCipher.contains("_DSS_WITH_") ) {
+              clinker._clinkerPopupContentSignature.textContent   =  ("Signature   : DSA");
           }
  
           // grade the bulk cipher and bit length
           if ( symetricCipher.contains("_AES_256_") ) {
-          clinker._clinkerPopupContentBulkCipher.textContent  =  ("Bulk Cipher : AES 256 bit      (15/15)");
-          clinker_conn_score += 15;
+              estimator.setBulkCipher("AES-256");
+              clinker_conn_score += 15;
           } else if ( symetricCipher.contains("_AES_128_") ) {
-          clinker._clinkerPopupContentBulkCipher.textContent  =  ("Bulk Cipher : AES 128 bit      (15/15)");
-          clinker_conn_score += 15;
+              estimator.setBulkCipher("AES-128");
+              clinker_conn_score += 15;
           } else if ( symetricCipher.contains("_RC4_128_") ) {
-          clinker._clinkerPopupContentBulkCipher.textContent  =  ("Bulk Cipher : RC4 128 bit      ( 4/15)");
+              estimator.setBulkCipher("RC4");
           clinker_conn_score += 4;
           } else if ( symetricCipher.contains("_3DES_") ) {
-          clinker._clinkerPopupContentBulkCipher.textContent  =  ("Bulk Cipher : 3DES 168 bit     ( 4/15)");
+              estimator.setBulkCipher("3DES");
           clinker_conn_score += 4;
           } else if ( symetricCipher.contains("_CAMELLIA_256_") ) {
-          clinker._clinkerPopupContentBulkCipher.textContent  =  ("Bulk Cipher : Camellia 256 bit (15/15)");
+              estimator.setBulkCipher("CAMELLIA-256");
           clinker_conn_score += 15;
           } else if ( symetricCipher.contains("_CAMELLIA_128_") ) {
-          clinker._clinkerPopupContentBulkCipher.textContent  =  ("Bulk Cipher : Camellia 128 bit (15/15)");
-          clinker_conn_score += 15;
+              estimator.setBulkCipher("CAMELLIA-128");
+              clinker_conn_score += 15;
           }
+
+          // set the detailed popup info
+          var cipher_name = String(estimator.getEncryptionCipher() + "                 ").slice(0,16);
+          var cipher_los = estimator.getCipherLoS();
+          clinker._clinkerPopupContentBulkCipher.textContent =
+              ("Bulk Cipher : ").concat(cipher_name).concat(" (").concat(cipher_los).concat(" bit)");
 
           // grade the a Message Authentication Code (MAC)
           if ( symetricCipher.contains("_GCM_SHA256") ) {
@@ -744,7 +853,6 @@ var clinker = {
           clinker_conn_score += 8; }
 
        }
-
 
        // Is the connection secure? 
        if (clinker_conn_score >= 90 ) {
