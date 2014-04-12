@@ -1,9 +1,13 @@
 /**
-*** Calomel SSL Validation
-***    https://calomel.org
-**/
+ * Clinker TLS validator
+ * https://github.com/tomato42/clinker
+ *
+ * Previously
+ * Calomel SSL Validation
+ *    https://clinker.org
+ */
 
-var calomelsslvalidation = {
+var clinker = {
 
   startFirefox: function() {
 
@@ -12,339 +16,339 @@ var calomelsslvalidation = {
     const prefs = cc["@mozilla.org/preferences-service;1"].getService(ci.nsIPrefBranch);
 
     // retrieve user preference
-    var calomel_prefAnimMode     = prefs.getBoolPref("extensions.calomelsslvalidation.animations");
-    var calomel_prefCipher256pfs = prefs.getBoolPref("extensions.calomelsslvalidation.ciphers_256pfs");
-    var calomel_prefCipher128pfs = prefs.getBoolPref("extensions.calomelsslvalidation.ciphers_128pfs");
-    var calomel_prefCipher128    = prefs.getBoolPref("extensions.calomelsslvalidation.ciphers_128");
-    var calomel_prefCipherAll    = prefs.getBoolPref("extensions.calomelsslvalidation.ciphers_all");
-    var calomel_prefOCSP         = prefs.getBoolPref("extensions.calomelsslvalidation.ocsp");
-    var calomel_prefTLS          = prefs.getBoolPref("extensions.calomelsslvalidation.tls");
-    var calomel_prefProxyDns     = prefs.getBoolPref("extensions.calomelsslvalidation.proxy_dns");
-    var calomel_prefToolTips     = prefs.getBoolPref("extensions.calomelsslvalidation.tool_tips");
-    var calomel_prefPaintDelay   = prefs.getBoolPref("extensions.calomelsslvalidation.paint_delay");
-    var calomel_prefSafeBrowsing = prefs.getBoolPref("extensions.calomelsslvalidation.safe_browsing");
-    var calomel_prefPrefetch     = prefs.getBoolPref("extensions.calomelsslvalidation.prefetch");
-    var calomel_prefDnsPrefetch  = prefs.getBoolPref("extensions.calomelsslvalidation.dns_prefetch");
-    var calomel_prefGeoLocate    = prefs.getBoolPref("extensions.calomelsslvalidation.geo_locate");
-    var calomel_prefSpelling     = prefs.getBoolPref("extensions.calomelsslvalidation.spelling");
-    var calomel_prefTabTitle     = prefs.getBoolPref("extensions.calomelsslvalidation.tab_title");
-    var calomel_prefMemCache     = prefs.getBoolPref("extensions.calomelsslvalidation.mem_cache");
-    var calomel_prefUrlGuess     = prefs.getBoolPref("extensions.calomelsslvalidation.url_guess");
-    var calomel_prefDnsCache     = prefs.getBoolPref("extensions.calomelsslvalidation.dns_cache");
-    var calomel_prefSendReferer  = prefs.getBoolPref("extensions.calomelsslvalidation.send_referer");
-    var calomel_prefUserAgent    = prefs.getBoolPref("extensions.calomelsslvalidation.user_agent");
+    var clinker_prefAnimMode     = prefs.getBoolPref("extensions.clinker.animations");
+    var clinker_prefCipher256pfs = prefs.getBoolPref("extensions.clinker.ciphers_256pfs");
+    var clinker_prefCipher128pfs = prefs.getBoolPref("extensions.clinker.ciphers_128pfs");
+    var clinker_prefCipher128    = prefs.getBoolPref("extensions.clinker.ciphers_128");
+    var clinker_prefCipherAll    = prefs.getBoolPref("extensions.clinker.ciphers_all");
+    var clinker_prefOCSP         = prefs.getBoolPref("extensions.clinker.ocsp");
+    var clinker_prefTLS          = prefs.getBoolPref("extensions.clinker.tls");
+    var clinker_prefProxyDns     = prefs.getBoolPref("extensions.clinker.proxy_dns");
+    var clinker_prefToolTips     = prefs.getBoolPref("extensions.clinker.tool_tips");
+    var clinker_prefPaintDelay   = prefs.getBoolPref("extensions.clinker.paint_delay");
+    var clinker_prefSafeBrowsing = prefs.getBoolPref("extensions.clinker.safe_browsing");
+    var clinker_prefPrefetch     = prefs.getBoolPref("extensions.clinker.prefetch");
+    var clinker_prefDnsPrefetch  = prefs.getBoolPref("extensions.clinker.dns_prefetch");
+    var clinker_prefGeoLocate    = prefs.getBoolPref("extensions.clinker.geo_locate");
+    var clinker_prefSpelling     = prefs.getBoolPref("extensions.clinker.spelling");
+    var clinker_prefTabTitle     = prefs.getBoolPref("extensions.clinker.tab_title");
+    var clinker_prefMemCache     = prefs.getBoolPref("extensions.clinker.mem_cache");
+    var clinker_prefUrlGuess     = prefs.getBoolPref("extensions.clinker.url_guess");
+    var clinker_prefDnsCache     = prefs.getBoolPref("extensions.clinker.dns_cache");
+    var clinker_prefSendReferer  = prefs.getBoolPref("extensions.clinker.send_referer");
+    var clinker_prefUserAgent    = prefs.getBoolPref("extensions.clinker.user_agent");
 
     // set cipher toggle on start of firefox
-    prefs.setBoolPref("extensions.calomelsslvalidation.ciphers_256pfs", calomel_prefCipher256pfs);
-    prefs.setBoolPref("extensions.calomelsslvalidation.ciphers_128pfs", calomel_prefCipher128pfs);
-    prefs.setBoolPref("extensions.calomelsslvalidation.ciphers_128", calomel_prefCipher128);
-    prefs.setBoolPref("extensions.calomelsslvalidation.ciphers_all", calomel_prefCipherAll);
+    prefs.setBoolPref("extensions.clinker.ciphers_256pfs", clinker_prefCipher256pfs);
+    prefs.setBoolPref("extensions.clinker.ciphers_128pfs", clinker_prefCipher128pfs);
+    prefs.setBoolPref("extensions.clinker.ciphers_128", clinker_prefCipher128);
+    prefs.setBoolPref("extensions.clinker.ciphers_all", clinker_prefCipherAll);
 
     // call method setting all user prefs
-    calomelsslvalidation.calomel_toggleAnimMode(calomel_prefAnimMode, prefs);
-    calomelsslvalidation.calomel_toggleCipherUser();
-    calomelsslvalidation.calomel_toggleOCSP(calomel_prefOCSP, prefs);
-    calomelsslvalidation.calomel_toggleTLS(calomel_prefTLS, prefs);
-    calomelsslvalidation.calomel_toggleProxyDns(calomel_prefProxyDns, prefs);
-    calomelsslvalidation.calomel_toggleToolTips(calomel_prefToolTips, prefs);
-    calomelsslvalidation.calomel_togglePaintDelay(calomel_prefPaintDelay, prefs);
-    calomelsslvalidation.calomel_toggleSafeBrowsing(calomel_prefSafeBrowsing, prefs);
-    calomelsslvalidation.calomel_togglePrefetch(calomel_prefPrefetch, prefs);
-    calomelsslvalidation.calomel_toggleDnsPrefetch(calomel_prefDnsPrefetch, prefs);
-    calomelsslvalidation.calomel_toggleGeoLocate(calomel_prefGeoLocate, prefs);
-    calomelsslvalidation.calomel_toggleSpelling(calomel_prefSpelling, prefs);
-    calomelsslvalidation.calomel_toggleMemCache(calomel_prefMemCache, prefs);
-    calomelsslvalidation.calomel_toggleUrlGuess(calomel_prefUrlGuess, prefs);
-    calomelsslvalidation.calomel_toggleDnsCache(calomel_prefDnsCache, prefs);
-    calomelsslvalidation.calomel_toggleSendReferer(calomel_prefSendReferer, prefs);
-    calomelsslvalidation.calomel_toggleUserAgent(calomel_prefUserAgent, prefs);
+    clinker.clinker_toggleAnimMode(clinker_prefAnimMode, prefs);
+    clinker.clinker_toggleCipherUser();
+    clinker.clinker_toggleOCSP(clinker_prefOCSP, prefs);
+    clinker.clinker_toggleTLS(clinker_prefTLS, prefs);
+    clinker.clinker_toggleProxyDns(clinker_prefProxyDns, prefs);
+    clinker.clinker_toggleToolTips(clinker_prefToolTips, prefs);
+    clinker.clinker_togglePaintDelay(clinker_prefPaintDelay, prefs);
+    clinker.clinker_toggleSafeBrowsing(clinker_prefSafeBrowsing, prefs);
+    clinker.clinker_togglePrefetch(clinker_prefPrefetch, prefs);
+    clinker.clinker_toggleDnsPrefetch(clinker_prefDnsPrefetch, prefs);
+    clinker.clinker_toggleGeoLocate(clinker_prefGeoLocate, prefs);
+    clinker.clinker_toggleSpelling(clinker_prefSpelling, prefs);
+    clinker.clinker_toggleMemCache(clinker_prefMemCache, prefs);
+    clinker.clinker_toggleUrlGuess(clinker_prefUrlGuess, prefs);
+    clinker.clinker_toggleDnsCache(clinker_prefDnsCache, prefs);
+    clinker.clinker_toggleSendReferer(clinker_prefSendReferer, prefs);
+    clinker.clinker_toggleUserAgent(clinker_prefUserAgent, prefs);
   },
 
 
    //enable or disable Online Certificate Status Protocol (OCSP)
-   calomel_toggleOCSP: function(param, prefs) {
-     if (param == false && prefs.getBoolPref("extensions.calomelsslvalidation.ocsp.state") == true)
+   clinker_toggleOCSP: function(param, prefs) {
+     if (param == false && prefs.getBoolPref("extensions.clinker.ocsp.state") == true)
                          { prefs.clearUserPref("security.OCSP.require");
                            prefs.clearUserPref("security.OCSP.enabled");
-                           prefs.clearUserPref("extensions.calomelsslvalidation.ocsp.state", true); }
+                           prefs.clearUserPref("extensions.clinker.ocsp.state", true); }
      if (param == true) {  prefs.setBoolPref("security.OCSP.require", false);
                            prefs.setIntPref("security.OCSP.enabled", "0");
-                           prefs.setBoolPref("extensions.calomelsslvalidation.ocsp.state", true); }
+                           prefs.setBoolPref("extensions.clinker.ocsp.state", true); }
    },
 
    //enable or disable TLSv1.2 and TLSv1.1, disable anything lower
-   calomel_toggleTLS: function(param, prefs) {
-     if (param == false && prefs.getBoolPref("extensions.calomelsslvalidation.tls.state") == true)
+   clinker_toggleTLS: function(param, prefs) {
+     if (param == false && prefs.getBoolPref("extensions.clinker.tls.state") == true)
                          { prefs.clearUserPref("security.tls.version.min");
                            prefs.clearUserPref("security.tls.version.max");
-                           prefs.clearUserPref("extensions.calomelsslvalidation.tls.state", true); }
+                           prefs.clearUserPref("extensions.clinker.tls.state", true); }
      if (param == true) {  prefs.setIntPref("security.tls.version.min", 2);
                            prefs.setIntPref("security.tls.version.max", 3); 
-                           prefs.setBoolPref("extensions.calomelsslvalidation.tls.state", true); }
+                           prefs.setBoolPref("extensions.clinker.tls.state", true); }
    },
 
    //enable or disable sending full referer info to server after a link is clicked
-   calomel_toggleSendReferer: function(param, prefs) {
-     if (param == false && prefs.getBoolPref("extensions.calomelsslvalidation.send_referer.state") == true)
+   clinker_toggleSendReferer: function(param, prefs) {
+     if (param == false && prefs.getBoolPref("extensions.clinker.send_referer.state") == true)
                          { prefs.clearUserPref("network.http.sendRefererHeader");
                            prefs.clearUserPref("network.http.sendSecureXSiteReferrer");
-                           prefs.clearUserPref("extensions.calomelsslvalidation.send_referer.state"); } 
+                           prefs.clearUserPref("extensions.clinker.send_referer.state"); }
      if (param == true) {  prefs.setIntPref("network.http.sendRefererHeader", 0); 
                            prefs.setBoolPref("network.http.sendSecureXSiteReferrer", false);
-                           prefs.setBoolPref("extensions.calomelsslvalidation.send_referer.state", true); }
+                           prefs.setBoolPref("extensions.clinker.send_referer.state", true); }
    },
 
    //send a more generic user agent string for privacy. No need for servers to know our OS or other info.
-   calomel_toggleUserAgent: function(param, prefs) {
-     if (param == false && prefs.getBoolPref("extensions.calomelsslvalidation.user_agent.state") == true)
+   clinker_toggleUserAgent: function(param, prefs) {
+     if (param == false && prefs.getBoolPref("extensions.clinker.user_agent.state") == true)
                          { prefs.clearUserPref("general.useragent.override");
-                           prefs.clearUserPref("extensions.calomelsslvalidation.user_agent.state"); } 
+                           prefs.clearUserPref("extensions.clinker.user_agent.state"); }
      if (param == true) {  prefs.setCharPref("general.useragent.override", "Mozilla/5.0 (Gecko) Firefox/64");
-                           prefs.setBoolPref("extensions.calomelsslvalidation.user_agent.state", true); }
+                           prefs.setBoolPref("extensions.clinker.user_agent.state", true); }
    },
 
    //enable or disable internal firefox dns cache 
-   calomel_toggleDnsCache: function(param, prefs) {
-     if (param == false && prefs.getBoolPref("extensions.calomelsslvalidation.dns_cache.state") == true)
+   clinker_toggleDnsCache: function(param, prefs) {
+     if (param == false && prefs.getBoolPref("extensions.clinker.dns_cache.state") == true)
                          { prefs.clearUserPref("network.dnsCacheEntries"); 
                            prefs.clearUserPref("network.dnsCacheExpiration");
-                           prefs.clearUserPref("extensions.calomelsslvalidation.dns_cache.state"); } 
+                           prefs.clearUserPref("extensions.clinker.dns_cache.state"); }
      if (param == true) {  prefs.setIntPref("network.dnsCacheEntries", 0); 
                            prefs.setIntPref("network.dnsCacheExpiration", 0);
-                           prefs.setBoolPref("extensions.calomelsslvalidation.dns_cache.state", true); }
+                           prefs.setBoolPref("extensions.clinker.dns_cache.state", true); }
    },
 
    //enable or disable caching to memory only, no disk and increase cache size to 128meg 
-   calomel_toggleMemCache: function(param, prefs) {
-     if (param == false && prefs.getBoolPref("extensions.calomelsslvalidation.mem_cache.state") == true )
+   clinker_toggleMemCache: function(param, prefs) {
+     if (param == false && prefs.getBoolPref("extensions.clinker.mem_cache.state") == true )
                          { prefs.clearUserPref("browser.cache.disk.enable");
                            prefs.clearUserPref("browser.cache.disk.capacity"); 
                            prefs.clearUserPref("browser.cache.memory.enable");
                            prefs.clearUserPref("browser.sessionhistory.cache_subframes");
                            prefs.clearUserPref("browser.cache.check_doc_frequency"); 
                            prefs.clearUserPref("browser.cache.memory.capacity");
-                           prefs.clearUserPref("extensions.calomelsslvalidation.mem_cache.state"); }
+                           prefs.clearUserPref("extensions.clinker.mem_cache.state"); }
      if (param == true) { prefs.setBoolPref("browser.cache.disk.enable", false);
                           prefs.setIntPref("browser.cache.disk.capacity", 0); 
                           prefs.setBoolPref("browser.cache.memory.enable", true);
                           prefs.setBoolPref("browser.sessionhistory.cache_subframes", true);
                           prefs.setIntPref("browser.cache.check_doc_frequency", 3); 
                           prefs.setIntPref("browser.cache.memory.capacity",  131072);
-                          prefs.setBoolPref("extensions.calomelsslvalidation.mem_cache.state",true); }
+                          prefs.setBoolPref("extensions.clinker.mem_cache.state",true); }
    },
 
    //enable or disable spell checking 
-   calomel_toggleSpelling: function(param, prefs) {
-     if (param == false && prefs.getBoolPref("extensions.calomelsslvalidation.spelling.state") == true)
+   clinker_toggleSpelling: function(param, prefs) {
+     if (param == false && prefs.getBoolPref("extensions.clinker.spelling.state") == true)
                         { prefs.clearUserPref("layout.spellcheckDefault");
-                          prefs.clearUserPref("extensions.calomelsslvalidation.spelling.state"); }
+                          prefs.clearUserPref("extensions.clinker.spelling.state"); }
      if (param == true) { prefs.setIntPref("layout.spellcheckDefault", 2);
-                          prefs.setBoolPref("extensions.calomelsslvalidation.spelling.state", true); }
+                          prefs.setBoolPref("extensions.clinker.spelling.state", true); }
    },
 
    //enable or disable geo location reporting to websites 
-   calomel_toggleGeoLocate: function(param, prefs) {
-     if (param == false && prefs.getBoolPref("extensions.calomelsslvalidation.geo_locate.state") == true)
+   clinker_toggleGeoLocate: function(param, prefs) {
+     if (param == false && prefs.getBoolPref("extensions.clinker.geo_locate.state") == true)
                         { prefs.clearUserPref("geo.enabled");
-                          prefs.clearUserPref("extensions.calomelsslvalidation.geo_locate.state"); }
+                          prefs.clearUserPref("extensions.clinker.geo_locate.state"); }
      if (param == true) { prefs.setBoolPref("geo.enabled", false); 
-                          prefs.setBoolPref("extensions.calomelsslvalidation.geo_locate.state", true); }
+                          prefs.setBoolPref("extensions.clinker.geo_locate.state", true); }
    },
 
    //enable or disable short URL keyword guessing 
-   calomel_toggleUrlGuess: function(param, prefs) {
-     if (param == false && prefs.getBoolPref("extensions.calomelsslvalidation.url_guess.state") == true)
+   clinker_toggleUrlGuess: function(param, prefs) {
+     if (param == false && prefs.getBoolPref("extensions.clinker.url_guess.state") == true)
                         { prefs.clearUserPref("browser.fixup.alternate.enabled");
                           prefs.clearUserPref("keyword.enabled");
-                          prefs.clearUserPref("extensions.calomelsslvalidation.url_guess.state"); }
+                          prefs.clearUserPref("extensions.clinker.url_guess.state"); }
      if (param == true) { prefs.setBoolPref("browser.fixup.alternate.enabled", false);
                           prefs.setBoolPref("keyword.enabled", false);
-                          prefs.setBoolPref("extensions.calomelsslvalidation.url_guess.state", true); }
+                          prefs.setBoolPref("extensions.clinker.url_guess.state", true); }
    },
 
    //enable or disable prefetch of unvisted sites 
-   calomel_toggleDnsPrefetch: function(param, prefs) {
-     if (param == false && prefs.getBoolPref("extensions.calomelsslvalidation.dns_prefetch.state") == true )
+   clinker_toggleDnsPrefetch: function(param, prefs) {
+     if (param == false && prefs.getBoolPref("extensions.clinker.dns_prefetch.state") == true )
                         { prefs.clearUserPref("network.dns.disablePrefetch");
                           prefs.clearUserPref("network.dns.disablePrefetchFromHTTPS");
-                          prefs.clearUserPref("extensions.calomelsslvalidation.dns_prefetch.state") }
+                          prefs.clearUserPref("extensions.clinker.dns_prefetch.state") }
      if (param == true) { prefs.setBoolPref("network.dns.disablePrefetch", true);
                           prefs.setBoolPref("network.dns.disablePrefetchFromHTTPS", true);
-                          prefs.setBoolPref("extensions.calomelsslvalidation.dns_prefetch.state", true); }
+                          prefs.setBoolPref("extensions.clinker.dns_prefetch.state", true); }
    },
 
    //enable or disable the prefetching of unvisited links
-   calomel_togglePrefetch: function(param, prefs) {
-     if (param == false && prefs.getBoolPref("extensions.calomelsslvalidation.prefetch.state") == true)
+   clinker_togglePrefetch: function(param, prefs) {
+     if (param == false && prefs.getBoolPref("extensions.clinker.prefetch.state") == true)
                         { prefs.clearUserPref("network.prefetch-next");
-                          prefs.clearUserPref("extensions.calomelsslvalidation.prefetch.state"); }
+                          prefs.clearUserPref("extensions.clinker.prefetch.state"); }
      if (param == true) { prefs.setBoolPref("network.prefetch-next", false);
-                          prefs.setBoolPref("extensions.calomelsslvalidation.prefetch.state", true); }
+                          prefs.setBoolPref("extensions.clinker.prefetch.state", true); }
    },
 
    //enable or disable paint delay
-   calomel_togglePaintDelay: function(param, prefs) {
-     if (param == false && prefs.getBoolPref("extensions.calomelsslvalidation.paint_delay.state") == true)
+   clinker_togglePaintDelay: function(param, prefs) {
+     if (param == false && prefs.getBoolPref("extensions.clinker.paint_delay.state") == true)
                         { prefs.clearUserPref("nglayout.initialpaint.delay");
                            prefs.clearUserPref("content.notify.ontimer");
                            prefs.clearUserPref("content.notify.backoffcount"); 
                            prefs.clearUserPref("content.notify.interval");
-                           prefs.clearUserPref("extensions.calomelsslvalidation.paint_delay.state"); }
+                           prefs.clearUserPref("extensions.clinker.paint_delay.state"); }
      if (param == true) { prefs.setIntPref("nglayout.initialpaint.delay", "2000");
                           prefs.setBoolPref("content.notify.ontimer", "true");
                           prefs.setIntPref("content.notify.backoffcount", "5"); 
                           prefs.setIntPref("content.notify.interval", "1000000");
-                          prefs.setBoolPref("extensions.calomelsslvalidation.paint_delay.state", true); }
+                          prefs.setBoolPref("extensions.clinker.paint_delay.state", true); }
    },
 
    //enable or disable animated images
-   calomel_toggleAnimMode: function(param, prefs) {
-     if (param == false && prefs.getBoolPref("extensions.calomelsslvalidation.animations.state") == true)
+   clinker_toggleAnimMode: function(param, prefs) {
+     if (param == false && prefs.getBoolPref("extensions.clinker.animations.state") == true)
                         { prefs.clearUserPref("image.animation_mode");
-                          prefs.clearUserPref("extensions.calomelsslvalidation.animations.state"); }
+                          prefs.clearUserPref("extensions.clinker.animations.state"); }
      if (param == true) { prefs.setCharPref("image.animation_mode", "none");
-                          prefs.setBoolPref("extensions.calomelsslvalidation.animations.state", true); }
+                          prefs.setBoolPref("extensions.clinker.animations.state", true); }
    },
 
    // enable or disable tool tips
-   calomel_toggleToolTips: function (param, prefs) {
-      if (param == false && prefs.getBoolPref("extensions.calomelsslvalidation.tool_tips.state") == true)
+   clinker_toggleToolTips: function (param, prefs) {
+      if (param == false && prefs.getBoolPref("extensions.clinker.tool_tips.state") == true)
                          { prefs.clearUserPref("browser.chrome.toolbar_tips");
-                           prefs.clearUserPref("extensions.calomelsslvalidation.tool_tips.state"); }
+                           prefs.clearUserPref("extensions.clinker.tool_tips.state"); }
       if (param == true) { prefs.setBoolPref("browser.chrome.toolbar_tips", false);
-                           prefs.setBoolPref("extensions.calomelsslvalidation.tool_tips.state", true); }
+                           prefs.setBoolPref("extensions.clinker.tool_tips.state", true); }
    },
 
    // enable or disable dns lookups over a proxy
-   calomel_toggleProxyDns: function (param, prefs) {
-      if (param == false && prefs.getBoolPref("extensions.calomelsslvalidation.proxy_dns.state") == true)
+   clinker_toggleProxyDns: function (param, prefs) {
+      if (param == false && prefs.getBoolPref("extensions.clinker.proxy_dns.state") == true)
                          { prefs.clearUserPref("network.proxy.socks_remote_dns");
-                           prefs.clearUserPref("extensions.calomelsslvalidation.proxy_dns.state"); }
+                           prefs.clearUserPref("extensions.clinker.proxy_dns.state"); }
       if (param == true) { prefs.setBoolPref("network.proxy.socks_remote_dns", true);
-                           prefs.setBoolPref("extensions.calomelsslvalidation.proxy_dns.state", true); }
+                           prefs.setBoolPref("extensions.clinker.proxy_dns.state", true); }
    },
 
    // enable or disable safe browsing
-   calomel_toggleSafeBrowsing: function(param, prefs) {
-      if (param == false && prefs.getBoolPref("extensions.calomelsslvalidation.safe_browsing.state") == true)
+   clinker_toggleSafeBrowsing: function(param, prefs) {
+      if (param == false && prefs.getBoolPref("extensions.clinker.safe_browsing.state") == true)
                          { prefs.clearUserPref("browser.safebrowsing.enabled");
                            prefs.clearUserPref("browser.safebrowsing.malware.enabled");
-                           prefs.clearUserPref("extensions.calomelsslvalidation.safe_browsing.state"); }
+                           prefs.clearUserPref("extensions.clinker.safe_browsing.state"); }
       if (param == true) { prefs.setBoolPref("browser.safebrowsing.enabled", false);
                            prefs.setBoolPref("browser.safebrowsing.malware.enabled", false);
-                           prefs.setBoolPref("extensions.calomelsslvalidation.safe_browsing.state", true); }
+                           prefs.setBoolPref("extensions.clinker.safe_browsing.state", true); }
    },
 /*
    // enable or disable the use of PFS ciphers
-   calomel_togglePfsCiphers: function(param, prefs) {
-      if (param == false && prefs.getBoolPref("extensions.calomelsslvalidation.pfs_ciphers.state") == true)
-                         { prefs.clearUserPref("extensions.calomelsslvalidation.pfs_ciphers.state"); }
-      if (param == true) { prefs.setBoolPref("extensions.calomelsslvalidation.pfs_ciphers.state", true); }
-      if (prefs.getBoolPref("extensions.calomelsslvalidation.high_ciphers") == false)
-                         { prefs.clearUserPref("extensions.calomelsslvalidation.pfs_ciphers");
-                           prefs.clearUserPref("extensions.calomelsslvalidation.pfs_ciphers.state");
-                           prefs.clearUserPref("extensions.calomelsslvalidation.pfs_ciphers_toggle");
+   clinker_togglePfsCiphers: function(param, prefs) {
+      if (param == false && prefs.getBoolPref("extensions.clinker.pfs_ciphers.state") == true)
+                         { prefs.clearUserPref("extensions.clinker.pfs_ciphers.state"); }
+      if (param == true) { prefs.setBoolPref("extensions.clinker.pfs_ciphers.state", true); }
+      if (prefs.getBoolPref("extensions.clinker.high_ciphers") == false)
+                         { prefs.clearUserPref("extensions.clinker.pfs_ciphers");
+                           prefs.clearUserPref("extensions.clinker.pfs_ciphers.state");
+                           prefs.clearUserPref("extensions.clinker.pfs_ciphers_toggle");
       }
    },
 */
 
    // enable or disable ciphers
-   calomel_toggleCipherUser: function(param, prefs) {
+   clinker_toggleCipherUser: function(param, prefs) {
 
    var cc = Components.classes;
    var ci = Components.interfaces;
    var prefs = cc["@mozilla.org/preferences-service;1"].getService(ci.nsIPrefBranch);
 
    // Ciphers 256 bit Perfect Forward Secrecy (PFS)
-   const calomel_listCipher256pfs = ("security.ssl3.ecdhe_ecdsa_aes_128_gcm_sha256;security.ssl3.ecdhe_rsa_aes_128_gcm_sha256;security.ssl3.ecdhe_rsa_aes_256_sha;security.ssl3.ecdhe_ecdsa_aes_256_sha;security.ssl3.dhe_rsa_camellia_256_sha;security.ssl3.dhe_rsa_aes_256_sha;security.ssl3.dhe_dss_camellia_256_sha;security.ssl3.dhe_dss_aes_256_sha").split(';');
+   const clinker_listCipher256pfs = ("security.ssl3.ecdhe_ecdsa_aes_128_gcm_sha256;security.ssl3.ecdhe_rsa_aes_128_gcm_sha256;security.ssl3.ecdhe_rsa_aes_256_sha;security.ssl3.ecdhe_ecdsa_aes_256_sha;security.ssl3.dhe_rsa_camellia_256_sha;security.ssl3.dhe_rsa_aes_256_sha;security.ssl3.dhe_dss_camellia_256_sha;security.ssl3.dhe_dss_aes_256_sha").split(';');
 
    // Ciphers 128 bit Perfect Forward Secrecy (PFS)
-   const calomel_listCipher128pfs = ("security.ssl3.ecdhe_ecdsa_aes_128_gcm_sha256;security.ssl3.ecdhe_rsa_aes_128_gcm_sha256;security.ssl3.ecdhe_rsa_rc4_128_sha;security.ssl3.ecdhe_rsa_aes_256_sha;security.ssl3.ecdhe_rsa_aes_128_sha;security.ssl3.ecdhe_ecdsa_rc4_128_sha;security.ssl3.ecdhe_ecdsa_aes_256_sha;security.ssl3.ecdhe_ecdsa_aes_128_sha;security.ssl3.dhe_rsa_camellia_256_sha;security.ssl3.dhe_rsa_camellia_128_sha;security.ssl3.dhe_rsa_aes_256_sha;security.ssl3.dhe_rsa_aes_128_sha;security.ssl3.dhe_dss_camellia_256_sha;security.ssl3.dhe_dss_camellia_128_sha;security.ssl3.dhe_dss_aes_256_sha;security.ssl3.dhe_dss_aes_128_sha").split(';');
+   const clinker_listCipher128pfs = ("security.ssl3.ecdhe_ecdsa_aes_128_gcm_sha256;security.ssl3.ecdhe_rsa_aes_128_gcm_sha256;security.ssl3.ecdhe_rsa_rc4_128_sha;security.ssl3.ecdhe_rsa_aes_256_sha;security.ssl3.ecdhe_rsa_aes_128_sha;security.ssl3.ecdhe_ecdsa_rc4_128_sha;security.ssl3.ecdhe_ecdsa_aes_256_sha;security.ssl3.ecdhe_ecdsa_aes_128_sha;security.ssl3.dhe_rsa_camellia_256_sha;security.ssl3.dhe_rsa_camellia_128_sha;security.ssl3.dhe_rsa_aes_256_sha;security.ssl3.dhe_rsa_aes_128_sha;security.ssl3.dhe_dss_camellia_256_sha;security.ssl3.dhe_dss_camellia_128_sha;security.ssl3.dhe_dss_aes_256_sha;security.ssl3.dhe_dss_aes_128_sha").split(';');
 
    // Ciphers 128 bit 
-   const calomel_listCipher128 = ("security.ssl3.ecdhe_ecdsa_aes_128_gcm_sha256;security.ssl3.ecdhe_rsa_aes_128_gcm_sha256;security.ssl3.rsa_rc4_128_sha;security.ssl3.rsa_rc4_128_md5;security.ssl3.rsa_camellia_256_sha;security.ssl3.rsa_camellia_128_sha;security.ssl3.rsa_aes_256_sha;security.ssl3.rsa_aes_128_sha;security.ssl3.ecdhe_rsa_rc4_128_sha;security.ssl3.ecdhe_rsa_aes_256_sha;security.ssl3.ecdhe_rsa_aes_128_sha;security.ssl3.ecdhe_ecdsa_rc4_128_sha;security.ssl3.ecdhe_ecdsa_aes_256_sha;security.ssl3.ecdhe_ecdsa_aes_128_sha;security.ssl3.ecdh_rsa_rc4_128_sha;security.ssl3.ecdh_rsa_aes_256_sha;security.ssl3.ecdh_rsa_aes_128_sha;security.ssl3.ecdh_ecdsa_rc4_128_sha;security.ssl3.ecdh_ecdsa_aes_256_sha;security.ssl3.ecdh_ecdsa_aes_128_sha;security.ssl3.dhe_rsa_camellia_256_sha;security.ssl3.dhe_rsa_camellia_128_sha;security.ssl3.dhe_rsa_aes_256_sha;security.ssl3.dhe_rsa_aes_128_sha;security.ssl3.dhe_dss_camellia_256_sha;security.ssl3.dhe_dss_camellia_128_sha;security.ssl3.dhe_dss_aes_256_sha;security.ssl3.dhe_dss_aes_128_sha").split(';');
+   const clinker_listCipher128 = ("security.ssl3.ecdhe_ecdsa_aes_128_gcm_sha256;security.ssl3.ecdhe_rsa_aes_128_gcm_sha256;security.ssl3.rsa_rc4_128_sha;security.ssl3.rsa_rc4_128_md5;security.ssl3.rsa_camellia_256_sha;security.ssl3.rsa_camellia_128_sha;security.ssl3.rsa_aes_256_sha;security.ssl3.rsa_aes_128_sha;security.ssl3.ecdhe_rsa_rc4_128_sha;security.ssl3.ecdhe_rsa_aes_256_sha;security.ssl3.ecdhe_rsa_aes_128_sha;security.ssl3.ecdhe_ecdsa_rc4_128_sha;security.ssl3.ecdhe_ecdsa_aes_256_sha;security.ssl3.ecdhe_ecdsa_aes_128_sha;security.ssl3.ecdh_rsa_rc4_128_sha;security.ssl3.ecdh_rsa_aes_256_sha;security.ssl3.ecdh_rsa_aes_128_sha;security.ssl3.ecdh_ecdsa_rc4_128_sha;security.ssl3.ecdh_ecdsa_aes_256_sha;security.ssl3.ecdh_ecdsa_aes_128_sha;security.ssl3.dhe_rsa_camellia_256_sha;security.ssl3.dhe_rsa_camellia_128_sha;security.ssl3.dhe_rsa_aes_256_sha;security.ssl3.dhe_rsa_aes_128_sha;security.ssl3.dhe_dss_camellia_256_sha;security.ssl3.dhe_dss_camellia_128_sha;security.ssl3.dhe_dss_aes_256_sha;security.ssl3.dhe_dss_aes_128_sha").split(';');
 
    // list of all ciphers 
-   const calomel_listCipherAll = ("security.ssl3.ecdhe_ecdsa_aes_128_gcm_sha256;security.ssl3.ecdhe_rsa_aes_128_gcm_sha256;security.ssl3.rsa_seed_sha;security.ssl3.rsa_rc4_128_sha;security.ssl3.rsa_rc4_128_md5;security.ssl3.rsa_fips_des_ede3_sha;security.ssl3.rsa_des_ede3_sha;security.ssl3.rsa_camellia_256_sha;security.ssl3.rsa_camellia_128_sha;security.ssl3.rsa_aes_256_sha;security.ssl3.rsa_aes_128_sha;security.ssl3.ecdhe_rsa_rc4_128_sha;security.ssl3.ecdhe_rsa_des_ede3_sha;security.ssl3.ecdhe_rsa_aes_256_sha;security.ssl3.ecdhe_rsa_aes_128_sha;security.ssl3.ecdhe_ecdsa_rc4_128_sha;security.ssl3.ecdhe_ecdsa_des_ede3_sha;security.ssl3.ecdhe_ecdsa_aes_256_sha;security.ssl3.ecdhe_ecdsa_aes_128_sha;security.ssl3.ecdh_rsa_rc4_128_sha;security.ssl3.ecdh_rsa_des_ede3_sha;security.ssl3.ecdh_rsa_aes_256_sha;security.ssl3.ecdh_rsa_aes_128_sha;security.ssl3.ecdh_ecdsa_rc4_128_sha;security.ssl3.ecdh_ecdsa_des_ede3_sha;security.ssl3.ecdh_ecdsa_aes_256_sha;security.ssl3.ecdh_ecdsa_aes_128_sha;security.ssl3.dhe_rsa_des_ede3_sha;security.ssl3.dhe_rsa_camellia_256_sha;security.ssl3.dhe_rsa_camellia_128_sha;security.ssl3.dhe_rsa_aes_256_sha;security.ssl3.dhe_rsa_aes_128_sha;security.ssl3.dhe_dss_des_ede3_sha;security.ssl3.dhe_dss_camellia_256_sha;security.ssl3.dhe_dss_camellia_128_sha;security.ssl3.dhe_dss_aes_256_sha;security.ssl3.dhe_dss_aes_128_sha;security.enable_ssl3").split(';');
+   const clinker_listCipherAll = ("security.ssl3.ecdhe_ecdsa_aes_128_gcm_sha256;security.ssl3.ecdhe_rsa_aes_128_gcm_sha256;security.ssl3.rsa_seed_sha;security.ssl3.rsa_rc4_128_sha;security.ssl3.rsa_rc4_128_md5;security.ssl3.rsa_fips_des_ede3_sha;security.ssl3.rsa_des_ede3_sha;security.ssl3.rsa_camellia_256_sha;security.ssl3.rsa_camellia_128_sha;security.ssl3.rsa_aes_256_sha;security.ssl3.rsa_aes_128_sha;security.ssl3.ecdhe_rsa_rc4_128_sha;security.ssl3.ecdhe_rsa_des_ede3_sha;security.ssl3.ecdhe_rsa_aes_256_sha;security.ssl3.ecdhe_rsa_aes_128_sha;security.ssl3.ecdhe_ecdsa_rc4_128_sha;security.ssl3.ecdhe_ecdsa_des_ede3_sha;security.ssl3.ecdhe_ecdsa_aes_256_sha;security.ssl3.ecdhe_ecdsa_aes_128_sha;security.ssl3.ecdh_rsa_rc4_128_sha;security.ssl3.ecdh_rsa_des_ede3_sha;security.ssl3.ecdh_rsa_aes_256_sha;security.ssl3.ecdh_rsa_aes_128_sha;security.ssl3.ecdh_ecdsa_rc4_128_sha;security.ssl3.ecdh_ecdsa_des_ede3_sha;security.ssl3.ecdh_ecdsa_aes_256_sha;security.ssl3.ecdh_ecdsa_aes_128_sha;security.ssl3.dhe_rsa_des_ede3_sha;security.ssl3.dhe_rsa_camellia_256_sha;security.ssl3.dhe_rsa_camellia_128_sha;security.ssl3.dhe_rsa_aes_256_sha;security.ssl3.dhe_rsa_aes_128_sha;security.ssl3.dhe_dss_des_ede3_sha;security.ssl3.dhe_dss_camellia_256_sha;security.ssl3.dhe_dss_camellia_128_sha;security.ssl3.dhe_dss_aes_256_sha;security.ssl3.dhe_dss_aes_128_sha;security.enable_ssl3").split(';');
 
      // enable Ciphers 256 bit Perfect Forward Secrecy (PFS)
-     if (prefs.getBoolPref("extensions.calomelsslvalidation.ciphers_256pfs")) {
+     if (prefs.getBoolPref("extensions.clinker.ciphers_256pfs")) {
          prefs.setBoolPref("security.enable_tls", true);
-         prefs.setBoolPref("extensions.calomelsslvalidation.ciphers_256pfs", true);
-         prefs.clearUserPref("extensions.calomelsslvalidation.ciphers_256pfs.state");
-         prefs.clearUserPref("extensions.calomelsslvalidation.ciphers_128pfs");
-         prefs.clearUserPref("extensions.calomelsslvalidation.ciphers_128pfs.state");
-         prefs.clearUserPref("extensions.calomelsslvalidation.ciphers_128");
-         prefs.clearUserPref("extensions.calomelsslvalidation.ciphers_128.state");
-         prefs.clearUserPref("extensions.calomelsslvalidation.ciphers_all");
-         prefs.clearUserPref("extensions.calomelsslvalidation.ciphers_all.state");
-         for (var i=0; i<calomel_listCipherAll.length; i++) prefs.setBoolPref(calomel_listCipherAll[i], false);
-         for (var i=0; i<calomel_listCipher256pfs.length; i++) prefs.setBoolPref(calomel_listCipher256pfs[i], true);
+         prefs.setBoolPref("extensions.clinker.ciphers_256pfs", true);
+         prefs.clearUserPref("extensions.clinker.ciphers_256pfs.state");
+         prefs.clearUserPref("extensions.clinker.ciphers_128pfs");
+         prefs.clearUserPref("extensions.clinker.ciphers_128pfs.state");
+         prefs.clearUserPref("extensions.clinker.ciphers_128");
+         prefs.clearUserPref("extensions.clinker.ciphers_128.state");
+         prefs.clearUserPref("extensions.clinker.ciphers_all");
+         prefs.clearUserPref("extensions.clinker.ciphers_all.state");
+         for (var i=0; i<clinker_listCipherAll.length; i++) prefs.setBoolPref(clinker_listCipherAll[i], false);
+         for (var i=0; i<clinker_listCipher256pfs.length; i++) prefs.setBoolPref(clinker_listCipher256pfs[i], true);
       }
 
      // enable Ciphers 128 bit Perfect Forward Secrecy (PFS)
-     if (prefs.getBoolPref("extensions.calomelsslvalidation.ciphers_128pfs")) {
+     if (prefs.getBoolPref("extensions.clinker.ciphers_128pfs")) {
          prefs.setBoolPref("security.enable_tls", true);
-         prefs.clearUserPref("extensions.calomelsslvalidation.ciphers_256pfs");
-         prefs.clearUserPref("extensions.calomelsslvalidation.ciphers_256pfs.state");
-         prefs.setBoolPref("extensions.calomelsslvalidation.ciphers_128pfs", true);
-         prefs.clearUserPref("extensions.calomelsslvalidation.ciphers_128pfs.state");
-         prefs.clearUserPref("extensions.calomelsslvalidation.ciphers_128");
-         prefs.clearUserPref("extensions.calomelsslvalidation.ciphers_128.state");
-         prefs.clearUserPref("extensions.calomelsslvalidation.ciphers_all");
-         prefs.clearUserPref("extensions.calomelsslvalidation.ciphers_all.state");
-         for (var i=0; i<calomel_listCipherAll.length; i++) prefs.setBoolPref(calomel_listCipherAll[i], false);
-         for (var i=0; i<calomel_listCipher128pfs.length; i++) prefs.setBoolPref(calomel_listCipher128pfs[i], true);
+         prefs.clearUserPref("extensions.clinker.ciphers_256pfs");
+         prefs.clearUserPref("extensions.clinker.ciphers_256pfs.state");
+         prefs.setBoolPref("extensions.clinker.ciphers_128pfs", true);
+         prefs.clearUserPref("extensions.clinker.ciphers_128pfs.state");
+         prefs.clearUserPref("extensions.clinker.ciphers_128");
+         prefs.clearUserPref("extensions.clinker.ciphers_128.state");
+         prefs.clearUserPref("extensions.clinker.ciphers_all");
+         prefs.clearUserPref("extensions.clinker.ciphers_all.state");
+         for (var i=0; i<clinker_listCipherAll.length; i++) prefs.setBoolPref(clinker_listCipherAll[i], false);
+         for (var i=0; i<clinker_listCipher128pfs.length; i++) prefs.setBoolPref(clinker_listCipher128pfs[i], true);
      }
 
      // enable Ciphers 128 bit
-     if (prefs.getBoolPref("extensions.calomelsslvalidation.ciphers_128")) {
+     if (prefs.getBoolPref("extensions.clinker.ciphers_128")) {
          prefs.setBoolPref("security.enable_tls", true);
-         prefs.clearUserPref("extensions.calomelsslvalidation.ciphers_256pfs");
-         prefs.clearUserPref("extensions.calomelsslvalidation.ciphers_256pfs.state");
-         prefs.clearUserPref("extensions.calomelsslvalidation.ciphers_128pfs");
-         prefs.clearUserPref("extensions.calomelsslvalidation.ciphers_128pfs.state");
-         prefs.setBoolPref("extensions.calomelsslvalidation.ciphers_128", true);
-         prefs.clearUserPref("extensions.calomelsslvalidation.ciphers_128.state");
-         prefs.clearUserPref("extensions.calomelsslvalidation.ciphers_all");
-         prefs.clearUserPref("extensions.calomelsslvalidation.ciphers_all.state");
-         for (var i=0; i<calomel_listCipherAll.length; i++) prefs.setBoolPref(calomel_listCipherAll[i], false);
-         for (var i=0; i<calomel_listCipher128.length; i++) prefs.setBoolPref(calomel_listCipher128[i], true);
+         prefs.clearUserPref("extensions.clinker.ciphers_256pfs");
+         prefs.clearUserPref("extensions.clinker.ciphers_256pfs.state");
+         prefs.clearUserPref("extensions.clinker.ciphers_128pfs");
+         prefs.clearUserPref("extensions.clinker.ciphers_128pfs.state");
+         prefs.setBoolPref("extensions.clinker.ciphers_128", true);
+         prefs.clearUserPref("extensions.clinker.ciphers_128.state");
+         prefs.clearUserPref("extensions.clinker.ciphers_all");
+         prefs.clearUserPref("extensions.clinker.ciphers_all.state");
+         for (var i=0; i<clinker_listCipherAll.length; i++) prefs.setBoolPref(clinker_listCipherAll[i], false);
+         for (var i=0; i<clinker_listCipher128.length; i++) prefs.setBoolPref(clinker_listCipher128[i], true);
      }
 
      // Enable ALL ciphers (firefox defaults)
-     if (prefs.getBoolPref("extensions.calomelsslvalidation.ciphers_all")) {
+     if (prefs.getBoolPref("extensions.clinker.ciphers_all")) {
          prefs.clearUserPref("security.enable_tls");
-         for (var i=0; i<calomel_listCipherAll.length; i++) prefs.clearUserPref(calomel_listCipherAll[i]);
-         prefs.clearUserPref("extensions.calomelsslvalidation.ciphers_256pfs");
-         prefs.clearUserPref("extensions.calomelsslvalidation.ciphers_256pfs.state");
-         prefs.clearUserPref("extensions.calomelsslvalidation.ciphers_128pfs");
-         prefs.clearUserPref("extensions.calomelsslvalidation.ciphers_128pfs.state");
-         prefs.clearUserPref("extensions.calomelsslvalidation.ciphers_128.state");
-         prefs.clearUserPref("extensions.calomelsslvalidation.ciphers_128");
-         prefs.clearUserPref("extensions.calomelsslvalidation.ciphers_all.state");
-         prefs.setBoolPref("extensions.calomelsslvalidation.ciphers_all", true);
+         for (var i=0; i<clinker_listCipherAll.length; i++) prefs.clearUserPref(clinker_listCipherAll[i]);
+         prefs.clearUserPref("extensions.clinker.ciphers_256pfs");
+         prefs.clearUserPref("extensions.clinker.ciphers_256pfs.state");
+         prefs.clearUserPref("extensions.clinker.ciphers_128pfs");
+         prefs.clearUserPref("extensions.clinker.ciphers_128pfs.state");
+         prefs.clearUserPref("extensions.clinker.ciphers_128.state");
+         prefs.clearUserPref("extensions.clinker.ciphers_128");
+         prefs.clearUserPref("extensions.clinker.ciphers_all.state");
+         prefs.setBoolPref("extensions.clinker.ciphers_all", true);
      }
 
   },
 
   // open the cache summary. May be helpful for diagnostics.
-  calomel_summaryCacheUsage: function(event) {
+  clinker_summaryCacheUsage: function(event) {
     openUILink("about:cache", event, false, true);
   },
 
   // open the memory cache device. May be helpful for diagnostics.
-  calomel_memoryCacheUsage: function(event) {
+  clinker_memoryCacheUsage: function(event) {
     openUILink("about:cache?device=memory", event, false, true);
   },
 
   // open the disk cache device. May be helpful for diagnostics.
-  calomel_diskCacheUsage: function(event) {
+  clinker_diskCacheUsage: function(event) {
     openUILink("about:cache?device=disk", event, false, true);
   },
 
   // open the memory cache device. May be helpful for diagnostics.
-  calomel_offlineCacheUsage: function(event) {
+  clinker_offlineCacheUsage: function(event) {
     openUILink("about:cache?device=offline", event, false, true);
   },
 
@@ -358,36 +362,36 @@ var calomelsslvalidation = {
   //
 
   // events for mouse button clicks on the toolbar button. 0=left , 1=middle and 2=right mouse button
-  calomelButtonEvent: function(event) {
-     if (event.type == "click" && event.button == 0) { this._calomelPopup.openPopup(this._calomelPopupContentUrlImage, 'after_start'); }
-     if (event.type == "click" && event.button == 1) { window.openDialog('chrome://calomelsslvalidation/content/options.xul'); }
-     if (event.type == "click" && event.button == 2) { calomelsslvalidation.startFirefox(); }
+  clinkerButtonEvent: function(event) {
+     if (event.type == "click" && event.button == 0) { this._clinkerPopup.openPopup(this._clinkerPopupContentUrlImage, 'after_start'); }
+     if (event.type == "click" && event.button == 1) { window.openDialog('chrome://clinker/content/options.xul'); }
+     if (event.type == "click" && event.button == 2) { clinker.startFirefox(); }
   },
 
   // collect the elements from xul 
-  get _calomelPopup () { return document.getElementById("calomelsslvalidation-popup"); },
-  get _calomelPopupContentUrlImage () { return document.getElementById("calomelsslvalidation-urlicon"); },
-  get _calomelPopupContentHost () { return document.getElementById("calomelsslvalidation-popup-content-host"); },
-  get _calomelPopupContentSecure () { return document.getElementById("calomelsslvalidation-popup-content-secure"); },
-  get _calomelPopupContentCertificate () { return document.getElementById("calomelsslvalidation-popup-content-certificate"); },
-  get _calomelPopupContentPfs () { return document.getElementById("calomelsslvalidation-popup-content-pfs"); },
-  get _calomelPopupContentCiphersuite () { return document.getElementById("calomelsslvalidation-popup-content-ciphersuite"); },
-  get _calomelPopupContentKeyExchange () { return document.getElementById("calomelsslvalidation-popup-content-key_exchange"); },
-  get _calomelPopupContentSignature () { return document.getElementById("calomelsslvalidation-popup-content-signature"); },
-  get _calomelPopupContentBulkCipher () { return document.getElementById("calomelsslvalidation-popup-content-bulk_cipher"); },
-  get _calomelPopupContentMAC () { return document.getElementById("calomelsslvalidation-popup-content-mac"); },
-  get _calomelPopupContentHomePage () { return document.getElementById("calomelsslvalidation-popup-content-homepage"); },
-  get _calomelPopupContentCommonName () { return document.getElementById("calomelsslvalidation-popup-content-commonname"); },
-  get _calomelPopupContentCertType () { return document.getElementById("calomelsslvalidation-popup-content-cert-type"); },
-  get _calomelPopupContentOrganization () { return document.getElementById("calomelsslvalidation-popup-content-organization"); },
-  get _calomelPopupContentOrganizationSubCert () { return document.getElementById("calomelsslvalidation-popup-content-organization-subcert"); },
-  get _calomelPopupContentOrganizationCaCert () { return document.getElementById("calomelsslvalidation-popup-content-organization-cacert"); },
-  get _calomelPopupContentOrganizationLocation () { return document.getElementById("calomelsslvalidation-popup-content-organization-location"); },
-  get _calomelPopupContentIssuerOrganization () { return document.getElementById("calomelsslvalidation-popup-content-issuer"); },
-  get _calomelPopupContentIssuerLocation () { return document.getElementById("calomelsslvalidation-popup-content-issuer-location"); },
-  get _calomelPopupContentValidBeforeDate () { return document.getElementById("calomelsslvalidation-popup-content-before-date"); },
-  get _calomelPopupContentValidAfterDate () { return document.getElementById("calomelsslvalidation-popup-content-after-date"); },
-  get _calomelPopupContentCurrentDate () { return document.getElementById("calomelsslvalidation-popup-content-current-date"); },
+  get _clinkerPopup () { return document.getElementById("clinker-popup"); },
+  get _clinkerPopupContentUrlImage () { return document.getElementById("clinker-urlicon"); },
+  get _clinkerPopupContentHost () { return document.getElementById("clinker-popup-content-host"); },
+  get _clinkerPopupContentSecure () { return document.getElementById("clinker-popup-content-secure"); },
+  get _clinkerPopupContentCertificate () { return document.getElementById("clinker-popup-content-certificate"); },
+  get _clinkerPopupContentPfs () { return document.getElementById("clinker-popup-content-pfs"); },
+  get _clinkerPopupContentCiphersuite () { return document.getElementById("clinker-popup-content-ciphersuite"); },
+  get _clinkerPopupContentKeyExchange () { return document.getElementById("clinker-popup-content-key_exchange"); },
+  get _clinkerPopupContentSignature () { return document.getElementById("clinker-popup-content-signature"); },
+  get _clinkerPopupContentBulkCipher () { return document.getElementById("clinker-popup-content-bulk_cipher"); },
+  get _clinkerPopupContentMAC () { return document.getElementById("clinker-popup-content-mac"); },
+  get _clinkerPopupContentHomePage () { return document.getElementById("clinker-popup-content-homepage"); },
+  get _clinkerPopupContentCommonName () { return document.getElementById("clinker-popup-content-commonname"); },
+  get _clinkerPopupContentCertType () { return document.getElementById("clinker-popup-content-cert-type"); },
+  get _clinkerPopupContentOrganization () { return document.getElementById("clinker-popup-content-organization"); },
+  get _clinkerPopupContentOrganizationSubCert () { return document.getElementById("clinker-popup-content-organization-subcert"); },
+  get _clinkerPopupContentOrganizationCaCert () { return document.getElementById("clinker-popup-content-organization-cacert"); },
+  get _clinkerPopupContentOrganizationLocation () { return document.getElementById("clinker-popup-content-organization-location"); },
+  get _clinkerPopupContentIssuerOrganization () { return document.getElementById("clinker-popup-content-issuer"); },
+  get _clinkerPopupContentIssuerLocation () { return document.getElementById("clinker-popup-content-issuer-location"); },
+  get _clinkerPopupContentValidBeforeDate () { return document.getElementById("clinker-popup-content-before-date"); },
+  get _clinkerPopupContentValidAfterDate () { return document.getElementById("clinker-popup-content-after-date"); },
+  get _clinkerPopupContentCurrentDate () { return document.getElementById("clinker-popup-content-current-date"); },
 
   //
   // page load section
@@ -401,25 +405,25 @@ var calomelsslvalidation = {
      const prefs = cc["@mozilla.org/preferences-service;1"].getService(ci.nsIPrefBranch);
 
      // initilize the popup window
-     const calomelsslvalidation_current_greeting = "version 0.70";
-     calomelsslvalidation._calomelPopupContentSecure.textContent = calomelsslvalidation_current_greeting;
-     calomelsslvalidation._calomelPopupContentCurrentDate.textContent = (new Date());
+     const clinker_current_greeting = "version 0.70";
+     clinker._clinkerPopupContentSecure.textContent = clinker_current_greeting;
+     clinker._clinkerPopupContentCurrentDate.textContent = (new Date());
 
      // Install the toolbar button on first install ONLY (mozilla code)
-     var calomel_prefFirstInstall = prefs.getBoolPref("extensions.calomelsslvalidation.first_install");
-     if (calomel_prefFirstInstall) {
-      prefs.setBoolPref("extensions.calomelsslvalidation.first_install", false); 
+     var clinker_prefFirstInstall = prefs.getBoolPref("extensions.clinker.first_install");
+     if (clinker_prefFirstInstall) {
+      prefs.setBoolPref("extensions.clinker.first_install", false);
        try {
           var firefoxnav = document.getElementById("nav-bar");
           var curSet = firefoxnav.currentSet;
-          if (curSet.indexOf("calomelsslvalidation-urlicon") == -1)
+          if (curSet.indexOf("clinker-urlicon") == -1)
           {
             var set;
             // Place the button before the urlbar
             if (curSet.indexOf("urlbar-container") != -1)
-              set = curSet.replace(/urlbar-container/, "calomelsslvalidation-urlicon,urlbar-container");
+              set = curSet.replace(/urlbar-container/, "clinker-urlicon,urlbar-container");
             else  // at the end
-              set = curSet + ",calomelsslvalidation-urlicon";
+              set = curSet + ",clinker-urlicon";
             firefoxnav.setAttribute("currentset", set);
             firefoxnav.currentSet = set;
             document.persist("nav-bar", "currentset");
@@ -433,16 +437,16 @@ var calomelsslvalidation = {
         catch(e) { }
       } 
 
-     var calomel_updateListener = {
-       onStateChange:    function(aWebProgress, aRequest, aFlag, aStatus) { calomelsslvalidation.onPageUpdate(); },
-       onLocationChange: function(aWebProgress, aRequest, aURI) { calomelsslvalidation.onPageUpdate(); },
-       onSecurityChange: function(aWebProgress, aRequest, aState) { calomelsslvalidation.onPageUpdate(); },
+     var clinker_updateListener = {
+       onStateChange:    function(aWebProgress, aRequest, aFlag, aStatus) { clinker.onPageUpdate(); },
+       onLocationChange: function(aWebProgress, aRequest, aURI) { clinker.onPageUpdate(); },
+       onSecurityChange: function(aWebProgress, aRequest, aState) { clinker.onPageUpdate(); },
        onStatusChange: function(aWebProgress) { return; },
        onProgressChange: function(aWebProgress) { return; }
      };
 
-     //gb.addProgressListener(calomel_updateListener, ci.nsIWebProgress.NOTIFY_STATE_DOCUMENT);
-       gb.addProgressListener(calomel_updateListener);
+     //gb.addProgressListener(clinker_updateListener, ci.nsIWebProgress.NOTIFY_STATE_DOCUMENT);
+       gb.addProgressListener(clinker_updateListener);
     },
 
 
@@ -452,8 +456,8 @@ var calomelsslvalidation = {
    onPageUpdate: function() {
 
      // CURRENT VERSION
-     const calomelsslvalidation_current_version = 70;
-     const calomelsslvalidation_current_greeting = "version 0.70";
+     const clinker_current_version = 70;
+     const clinker_current_greeting = "version 0.70";
 
      // global constants
      const cc = Components.classes;
@@ -463,102 +467,102 @@ var calomelsslvalidation = {
      var currentBrowser = gb.selectedBrowser;
      var ui = currentBrowser.securityUI;
      var insecureSSL = (ui.state & ci.nsIWebProgressListener.STATE_IS_INSECURE);
-     var calomel_url_protocol = window.content.location.protocol;
-     var calomel_conn_score = 0;
-     var calomel_prefTabTitle = prefs.getBoolPref("extensions.calomelsslvalidation.tab_title");
+     var clinker_url_protocol = window.content.location.protocol;
+     var clinker_conn_score = 0;
+     var clinker_prefTabTitle = prefs.getBoolPref("extensions.clinker.tab_title");
    
-     // open the calomel help page on update or install
-     var calomel_prefHomeOnUpdate = prefs.getBoolPref("extensions.calomelsslvalidation.home_on_update");
-     var calomel_prefVersion = prefs.getIntPref("extensions.calomelsslvalidation.version");
-     if (calomel_prefHomeOnUpdate && calomel_prefVersion < calomelsslvalidation_current_version) {
+     // open the clinker help page on update or install
+     var clinker_prefHomeOnUpdate = prefs.getBoolPref("extensions.clinker.home_on_update");
+     var clinker_prefVersion = prefs.getIntPref("extensions.clinker.version");
+     if (clinker_prefHomeOnUpdate && clinker_prefVersion < clinker_current_version) {
        gBrowser.addTab("https://github.com/tomato42/clinker");
-       prefs.setIntPref("extensions.calomelsslvalidation.version", calomelsslvalidation_current_version);
+       prefs.setIntPref("extensions.clinker.version", clinker_current_version);
      }
 
      // if the toolbar button is not used on any toolbar just return
-     if (document.getElementById("calomelsslvalidation-urlicon") == null ) return;
+     if (document.getElementById("clinker-urlicon") == null ) return;
 
      // reset strings
-     calomelsslvalidation._calomelPopupContentHost.textContent = null;
-     calomelsslvalidation._calomelPopupContentSecure.textContent = calomelsslvalidation_current_greeting;
-     calomelsslvalidation._calomelPopupContentCiphersuite.textContent = null;
-     calomelsslvalidation._calomelPopupContentPfs.textContent         = null;  
-     calomelsslvalidation._calomelPopupContentKeyExchange.textContent = null;
-     calomelsslvalidation._calomelPopupContentSignature.textContent   = null;
-     calomelsslvalidation._calomelPopupContentBulkCipher.textContent  = null;
-     calomelsslvalidation._calomelPopupContentMAC.textContent         = null;
-     calomelsslvalidation._calomelPopupContentCommonName.textContent = null;
-     calomelsslvalidation._calomelPopupContentCertType.textContent = null;
-     calomelsslvalidation._calomelPopupContentOrganization.textContent = null;
-     calomelsslvalidation._calomelPopupContentOrganizationSubCert.textContent = null;
-     calomelsslvalidation._calomelPopupContentOrganizationCaCert.textContent = null;
-     calomelsslvalidation._calomelPopupContentOrganizationLocation.textContent = null;
-     calomelsslvalidation._calomelPopupContentIssuerOrganization.textContent = null;
-     calomelsslvalidation._calomelPopupContentIssuerLocation.textContent = null;
-     calomelsslvalidation._calomelPopupContentValidBeforeDate.textContent = null;
-     calomelsslvalidation._calomelPopupContentValidAfterDate.textContent = null;
-     calomelsslvalidation._calomelPopupContentCurrentDate.textContent = (new Date());
-     calomelsslvalidation._calomelPopupContentCertificate.textContent = null;
-     document.getElementById("calomelsslvalidation-urlicon").image="chrome://calomelsslvalidation/skin/calomelsslvalidation_grey_button.png";
+     clinker._clinkerPopupContentHost.textContent = null;
+     clinker._clinkerPopupContentSecure.textContent = clinker_current_greeting;
+     clinker._clinkerPopupContentCiphersuite.textContent = null;
+     clinker._clinkerPopupContentPfs.textContent         = null;
+     clinker._clinkerPopupContentKeyExchange.textContent = null;
+     clinker._clinkerPopupContentSignature.textContent   = null;
+     clinker._clinkerPopupContentBulkCipher.textContent  = null;
+     clinker._clinkerPopupContentMAC.textContent         = null;
+     clinker._clinkerPopupContentCommonName.textContent = null;
+     clinker._clinkerPopupContentCertType.textContent = null;
+     clinker._clinkerPopupContentOrganization.textContent = null;
+     clinker._clinkerPopupContentOrganizationSubCert.textContent = null;
+     clinker._clinkerPopupContentOrganizationCaCert.textContent = null;
+     clinker._clinkerPopupContentOrganizationLocation.textContent = null;
+     clinker._clinkerPopupContentIssuerOrganization.textContent = null;
+     clinker._clinkerPopupContentIssuerLocation.textContent = null;
+     clinker._clinkerPopupContentValidBeforeDate.textContent = null;
+     clinker._clinkerPopupContentValidAfterDate.textContent = null;
+     clinker._clinkerPopupContentCurrentDate.textContent = (new Date());
+     clinker._clinkerPopupContentCertificate.textContent = null;
+     document.getElementById("clinker-urlicon").image="chrome://clinker/skin/clinker_grey_button.png";
 
      // clear the title and icon from the tab if the user prefers it
-       if (calomel_prefTabTitle) {
+       if (clinker_prefTabTitle) {
           var current_tab = window.document.getElementById("content").selectedTab;
           current_tab.label = "";
           current_tab.setAttribute("image", " ");
        }
 
      // https ssl connections
-     if (calomel_url_protocol == "https:") {
+     if (clinker_url_protocol == "https:") {
   
       // collect the certificate information
       if (ui && !insecureSSL)  {
           ui.QueryInterface(ci.nsISSLStatusProvider);
-          var calomel_url_hostname = window.content.location.hostname;
+          var clinker_url_hostname = window.content.location.hostname;
           var status = ui.SSLStatus;
           if (!status) return;
-          var calomel_ssl_cert = status.serverCert;
-          if (!(calomel_ssl_cert)) return;
-          var calomel_date_validity = calomel_ssl_cert.validity.QueryInterface(ci.nsIX509CertValidity);
-          var calomel_ssl_cert_verification;
+          var clinker_ssl_cert = status.serverCert;
+          if (!(clinker_ssl_cert)) return;
+          var clinker_date_validity = clinker_ssl_cert.validity.QueryInterface(ci.nsIX509CertValidity);
+          var clinker_ssl_cert_verification;
           if (status && !insecureSSL) {
              status.QueryInterface(ci.nsISSLStatus);
       }
 
       // Check ssl certificate security state flags
       if (Ci.nsIWebProgressListener.STATE_IS_SECURE) {
-           calomel_ssl_cert_verification = "Verified";
+           clinker_ssl_cert_verification = "Verified";
       } else if (Ci.nsIWebProgressListener.STATE_IS_INSECURE) {
-           calomel_ssl_cert_verification = "WARNING! not trusted";
-           calomel_conn_score -= 100;
+           clinker_ssl_cert_verification = "WARNING! not trusted";
+           clinker_conn_score -= 100;
       } else {
-           calomel_ssl_cert_verification = "WARNING! broken";
-           calomel_conn_score -= 100;
+           clinker_ssl_cert_verification = "WARNING! broken";
+           clinker_conn_score -= 100;
       }
 
       // does the url hostname and certificate common name match?
-      var calomel_hosts_match = " (DOMAIN MISMATCH!)";
-            calomel_conn_score -= 100;
-      if (! calomel_ssl_cert.isDomainMismatch) {
-            calomel_hosts_match = " (matched)";
-            calomel_conn_score += 100;
+      var clinker_hosts_match = " (DOMAIN MISMATCH!)";
+            clinker_conn_score -= 100;
+      if (! clinker_ssl_cert.isDomainMismatch) {
+            clinker_hosts_match = " (matched)";
+            clinker_conn_score += 100;
       }
 
          // print out the certificate info
-         calomelsslvalidation._calomelPopupContentHost.textContent             = ("\nURL Host        : "+ calomel_url_hostname);
-         calomelsslvalidation._calomelPopupContentCommonName.textContent         = ("Common Name (CN): " + calomel_ssl_cert.commonName + calomel_hosts_match);
-         calomelsslvalidation._calomelPopupContentOrganization.textContent     = ("\nIssued to  : " + calomel_ssl_cert.organization);
-         calomelsslvalidation._calomelPopupContentIssuerOrganization.textContent = ("Issued by  : " + calomel_ssl_cert.issuerOrganization);
-         calomelsslvalidation._calomelPopupContentValidBeforeDate.textContent    = ("Valid from : " + calomel_date_validity.notBeforeLocalTime);
-         calomelsslvalidation._calomelPopupContentValidAfterDate.textContent     = ("Valid until: " + calomel_date_validity.notAfterLocalTime);
-         calomelsslvalidation._calomelPopupContentCurrentDate.textContent        = ("\n" + new Date());
+         clinker._clinkerPopupContentHost.textContent             = ("\nURL Host        : "+ clinker_url_hostname);
+         clinker._clinkerPopupContentCommonName.textContent         = ("Common Name (CN): " + clinker_ssl_cert.commonName + clinker_hosts_match);
+         clinker._clinkerPopupContentOrganization.textContent     = ("\nIssued to  : " + clinker_ssl_cert.organization);
+         clinker._clinkerPopupContentIssuerOrganization.textContent = ("Issued by  : " + clinker_ssl_cert.issuerOrganization);
+         clinker._clinkerPopupContentValidBeforeDate.textContent    = ("Valid from : " + clinker_date_validity.notBeforeLocalTime);
+         clinker._clinkerPopupContentValidAfterDate.textContent     = ("Valid until: " + clinker_date_validity.notAfterLocalTime);
+         clinker._clinkerPopupContentCurrentDate.textContent        = ("\n" + new Date());
       } 
 
       // type of certificate validation EV or DV, OV seems unused
        if (ui.state & ci.nsIWebProgressListener.STATE_IDENTITY_EV_TOPLEVEL) {
-            calomelsslvalidation._calomelPopupContentCertType.textContent = ("Class      : Extended Validation (EV)");
+            clinker._clinkerPopupContentCertType.textContent = ("Class      : Extended Validation (EV)");
        } else if (ui.state & ci.nsIWebProgressListener.STATE_IS_SECURE) {
-            calomelsslvalidation._calomelPopupContentCertType.textContent = ("Class      : Domain Validation (DV)");
+            clinker._clinkerPopupContentCertType.textContent = ("Class      : Domain Validation (DV)");
        }
 
        // retrive the ssl cipher and key length
@@ -569,212 +573,212 @@ var calomelsslvalidation = {
 
        // popup the ssl information if the connection is properly encrypted
        if (symetricCipher && symetricKeyLength ) {
-            var calomel_key_strength = null;
-            var calomel_cipher_strength = null;
+            var clinker_key_strength = null;
+            var clinker_cipher_strength = null;
 
       // get extended certificate information
       var serverCert = status.serverCert;
       if (serverCert instanceof ci.nsIX509Cert) {
         var certificatesAll = cc["@mozilla.org/security/nsASN1Tree;1"].createInstance(ci.nsIASN1Tree);
         certificatesAll.loadASN1Structure(serverCert.ASN1Structure);
-        var calomel_SubjectPublicKeyStrength = "";
-        var calomel_CertificateSignatureStrength = "";
-        var calomel_SubjectPublicKeyAlgorithm = certificatesAll.getDisplayData(4).replace(/PKCS #1/g,'').replace(/Encryption/g,'@');
-        var calomel_SubjectsPublicKey = certificatesAll.getDisplayData(12).split(" ")[1].replace(/\(/g,'');
-        var calomel_CertificateSignatureAlgrithm = certificatesAll.getDisplayData(certificatesAll.rowCount-2).replace(/PKCS #1/g,'').replace(/Encryption/g,'@');
-        var calomel_CertificateSignatureValue = certificatesAll.getDisplayData(certificatesAll.rowCount-1).split(" ");
+        var clinker_SubjectPublicKeyStrength = "";
+        var clinker_CertificateSignatureStrength = "";
+        var clinker_SubjectPublicKeyAlgorithm = certificatesAll.getDisplayData(4).replace(/PKCS #1/g,'').replace(/Encryption/g,'@');
+        var clinker_SubjectsPublicKey = certificatesAll.getDisplayData(12).split(" ")[1].replace(/\(/g,'');
+        var clinker_CertificateSignatureAlgrithm = certificatesAll.getDisplayData(certificatesAll.rowCount-2).replace(/PKCS #1/g,'').replace(/Encryption/g,'@');
+        var clinker_CertificateSignatureValue = certificatesAll.getDisplayData(certificatesAll.rowCount-1).split(" ");
 
-        var calomel_SubjectsPublicKeyLocationCity = "", calomel_SubjectsPublicKeyLocationState = "", calomel_SubjectsPublicKeyLocationCountry="";
-        var calomel_SubjectsPublicKeyLocation = certificatesAll.getDisplayData(9).split("\n");
-        for( i=0; i < calomel_SubjectsPublicKeyLocation.length; i++ ) {
-           if (calomel_SubjectsPublicKeyLocation[i].substring(0,3) == "L =") {
-               calomel_SubjectsPublicKeyLocationCity = calomel_SubjectsPublicKeyLocation[i].replace(/L =/g,'');  
+        var clinker_SubjectsPublicKeyLocationCity = "", clinker_SubjectsPublicKeyLocationState = "", clinker_SubjectsPublicKeyLocationCountry="";
+        var clinker_SubjectsPublicKeyLocation = certificatesAll.getDisplayData(9).split("\n");
+        for( i=0; i < clinker_SubjectsPublicKeyLocation.length; i++ ) {
+           if (clinker_SubjectsPublicKeyLocation[i].substring(0,3) == "L =") {
+               clinker_SubjectsPublicKeyLocationCity = clinker_SubjectsPublicKeyLocation[i].replace(/L =/g,'');
            }
-           if (calomel_SubjectsPublicKeyLocation[i].substring(0,4) == "ST =") {
-               calomel_SubjectsPublicKeyLocationState = calomel_SubjectsPublicKeyLocation[i].replace(/ST =/g,'');  
+           if (clinker_SubjectsPublicKeyLocation[i].substring(0,4) == "ST =") {
+               clinker_SubjectsPublicKeyLocationState = clinker_SubjectsPublicKeyLocation[i].replace(/ST =/g,'');
            }
-           if (calomel_SubjectsPublicKeyLocation[i].substring(0,3) == "C =") {
-               calomel_SubjectsPublicKeyLocationCountry = calomel_SubjectsPublicKeyLocation[i].replace(/C =/g,'');  
+           if (clinker_SubjectsPublicKeyLocation[i].substring(0,3) == "C =") {
+               clinker_SubjectsPublicKeyLocationCountry = clinker_SubjectsPublicKeyLocation[i].replace(/C =/g,'');
            }
         }
 
-        var calomel_SubjectsCertificateLocationCity = "", calomel_SubjectsCertificateLocationState = "", calomel_SubjectsCertificateLocationCountry="";
-        var calomel_SubjectsCertificateLocation = certificatesAll.getDisplayData(5).split("\n");
-        for( var i=0; i < calomel_SubjectsCertificateLocation.length; i++ ) {
-           if (calomel_SubjectsCertificateLocation[i].substring(0,3) == "L =") {
-               calomel_SubjectsCertificateLocationCity = calomel_SubjectsCertificateLocation[i].replace(/L =/g,'');  
+        var clinker_SubjectsCertificateLocationCity = "", clinker_SubjectsCertificateLocationState = "", clinker_SubjectsCertificateLocationCountry="";
+        var clinker_SubjectsCertificateLocation = certificatesAll.getDisplayData(5).split("\n");
+        for( var i=0; i < clinker_SubjectsCertificateLocation.length; i++ ) {
+           if (clinker_SubjectsCertificateLocation[i].substring(0,3) == "L =") {
+               clinker_SubjectsCertificateLocationCity = clinker_SubjectsCertificateLocation[i].replace(/L =/g,'');
            }
-           if (calomel_SubjectsCertificateLocation[i].substring(0,4) == "ST =") {
-               calomel_SubjectsCertificateLocationState = calomel_SubjectsCertificateLocation[i].replace(/ST =/g,'');  
+           if (clinker_SubjectsCertificateLocation[i].substring(0,4) == "ST =") {
+               clinker_SubjectsCertificateLocationState = clinker_SubjectsCertificateLocation[i].replace(/ST =/g,'');
            }
-           if (calomel_SubjectsCertificateLocation[i].substring(0,3) == "C =") {
-               calomel_SubjectsCertificateLocationCountry = calomel_SubjectsCertificateLocation[i].replace(/C =/g,'');  
+           if (clinker_SubjectsCertificateLocation[i].substring(0,3) == "C =") {
+               clinker_SubjectsCertificateLocationCountry = clinker_SubjectsCertificateLocation[i].replace(/C =/g,'');
            }
         }
 
         // grade the stength of the subject certificates hashes
 
-         if  (calomel_SubjectPublicKeyAlgorithm.indexOf("SHA") && calomel_SubjectsPublicKey == "Curve" && ( calomel_SubjectPublicKeyAlgorithm.contains("SHA-256") || calomel_SubjectPublicKeyAlgorithm.contains("SHA-512") ) ) {
-               calomel_SubjectPublicKeyStrength = " (10/10)";
-               calomel_conn_score += 10;
-         } else if  (calomel_SubjectPublicKeyAlgorithm.indexOf("SHA") && parseInt(calomel_SubjectsPublicKey) > 2047 && ( calomel_SubjectPublicKeyAlgorithm.contains("SHA-256") || calomel_SubjectPublicKeyAlgorithm.contains("SHA-512") ) ) {
-               calomel_SubjectPublicKeyStrength = " (10/10)";
-               calomel_conn_score += 10;
-         } else if  (calomel_SubjectPublicKeyAlgorithm.indexOf("SHA") && calomel_SubjectsPublicKey == "Curve" && calomel_SubjectPublicKeyAlgorithm.contains("SHA-1") ) {
-               calomel_SubjectPublicKeyStrength = " (4/10)";
-               calomel_conn_score += 4;
-         } else if  (calomel_SubjectPublicKeyAlgorithm.indexOf("SHA") && parseInt(calomel_SubjectsPublicKey) > 2047 && calomel_SubjectPublicKeyAlgorithm.contains("SHA-1") ) {
-               calomel_SubjectPublicKeyStrength = " (4/10)";
-               calomel_conn_score += 4;
+         if  (clinker_SubjectPublicKeyAlgorithm.indexOf("SHA") && clinker_SubjectsPublicKey == "Curve" && ( clinker_SubjectPublicKeyAlgorithm.contains("SHA-256") || clinker_SubjectPublicKeyAlgorithm.contains("SHA-512") ) ) {
+               clinker_SubjectPublicKeyStrength = " (10/10)";
+               clinker_conn_score += 10;
+         } else if  (clinker_SubjectPublicKeyAlgorithm.indexOf("SHA") && parseInt(clinker_SubjectsPublicKey) > 2047 && ( clinker_SubjectPublicKeyAlgorithm.contains("SHA-256") || clinker_SubjectPublicKeyAlgorithm.contains("SHA-512") ) ) {
+               clinker_SubjectPublicKeyStrength = " (10/10)";
+               clinker_conn_score += 10;
+         } else if  (clinker_SubjectPublicKeyAlgorithm.indexOf("SHA") && clinker_SubjectsPublicKey == "Curve" && clinker_SubjectPublicKeyAlgorithm.contains("SHA-1") ) {
+               clinker_SubjectPublicKeyStrength = " (4/10)";
+               clinker_conn_score += 4;
+         } else if  (clinker_SubjectPublicKeyAlgorithm.indexOf("SHA") && parseInt(clinker_SubjectsPublicKey) > 2047 && clinker_SubjectPublicKeyAlgorithm.contains("SHA-1") ) {
+               clinker_SubjectPublicKeyStrength = " (4/10)";
+               clinker_conn_score += 4;
          } else {
-             calomel_SubjectPublicKeyStrength = " (0/10)";
+             clinker_SubjectPublicKeyStrength = " (0/10)";
          }
 
         // grade the stength of the certificate authorities hashes
-         if (calomel_CertificateSignatureAlgrithm.indexOf("SHA") && calomel_CertificateSignatureValue[4] == "Curve" && (calomel_CertificateSignatureAlgrithm.contains("SHA-256") || calomel_CertificateSignatureAlgrithm.contains("SHA-512") ) ) {
-               calomel_CertificateSignatureStrength = " (10/10)";
-               calomel_conn_score += 10;
-         } else if (calomel_CertificateSignatureAlgrithm.indexOf("SHA") && parseInt(calomel_CertificateSignatureValue[4]) > 2047 && (calomel_CertificateSignatureAlgrithm.contains("SHA-256") || calomel_CertificateSignatureAlgrithm.contains("SHA-512") ) ) {
-               calomel_CertificateSignatureStrength = " (10/10)";
-               calomel_conn_score += 10;
-         } else if (calomel_CertificateSignatureAlgrithm.indexOf("SHA") && calomel_CertificateSignatureValue[4] == "Curve" && calomel_CertificateSignatureAlgrithm.contains("SHA-1") ) {
-               calomel_CertificateSignatureStrength = " (4/10)";
-               calomel_conn_score += 4;
-         } else if (calomel_CertificateSignatureAlgrithm.indexOf("SHA") && parseInt(calomel_CertificateSignatureValue[4]) > 2047 && calomel_CertificateSignatureAlgrithm.contains("SHA-1") ) {
-               calomel_CertificateSignatureStrength = " (4/10)";
-               calomel_conn_score += 4;
+         if (clinker_CertificateSignatureAlgrithm.indexOf("SHA") && clinker_CertificateSignatureValue[4] == "Curve" && (clinker_CertificateSignatureAlgrithm.contains("SHA-256") || clinker_CertificateSignatureAlgrithm.contains("SHA-512") ) ) {
+               clinker_CertificateSignatureStrength = " (10/10)";
+               clinker_conn_score += 10;
+         } else if (clinker_CertificateSignatureAlgrithm.indexOf("SHA") && parseInt(clinker_CertificateSignatureValue[4]) > 2047 && (clinker_CertificateSignatureAlgrithm.contains("SHA-256") || clinker_CertificateSignatureAlgrithm.contains("SHA-512") ) ) {
+               clinker_CertificateSignatureStrength = " (10/10)";
+               clinker_conn_score += 10;
+         } else if (clinker_CertificateSignatureAlgrithm.indexOf("SHA") && clinker_CertificateSignatureValue[4] == "Curve" && clinker_CertificateSignatureAlgrithm.contains("SHA-1") ) {
+               clinker_CertificateSignatureStrength = " (4/10)";
+               clinker_conn_score += 4;
+         } else if (clinker_CertificateSignatureAlgrithm.indexOf("SHA") && parseInt(clinker_CertificateSignatureValue[4]) > 2047 && clinker_CertificateSignatureAlgrithm.contains("SHA-1") ) {
+               clinker_CertificateSignatureStrength = " (4/10)";
+               clinker_conn_score += 4;
          } else {
-             calomel_CertificateSignatureStrength = " (0/10)";
+             clinker_CertificateSignatureStrength = " (0/10)";
          }
 
         // print the info
-        calomelsslvalidation._calomelPopupContentOrganizationSubCert.textContent = ("           :" + calomel_SubjectPublicKeyAlgorithm + " " + calomel_SubjectsPublicKey + " bit" + calomel_SubjectPublicKeyStrength);
-        calomelsslvalidation._calomelPopupContentOrganizationCaCert.textContent  = ("           :" + calomel_CertificateSignatureAlgrithm + " " + calomel_CertificateSignatureValue[4] + " bit" + calomel_CertificateSignatureStrength);
-        calomelsslvalidation._calomelPopupContentOrganizationLocation.textContent  = ("           :" + calomel_SubjectsPublicKeyLocationCity + calomel_SubjectsPublicKeyLocationState + calomel_SubjectsPublicKeyLocationCountry);
-        calomelsslvalidation._calomelPopupContentIssuerLocation.textContent  = ("           :" + calomel_SubjectsCertificateLocationCity + calomel_SubjectsCertificateLocationState + calomel_SubjectsCertificateLocationCountry);
+        clinker._clinkerPopupContentOrganizationSubCert.textContent = ("           :" + clinker_SubjectPublicKeyAlgorithm + " " + clinker_SubjectsPublicKey + " bit" + clinker_SubjectPublicKeyStrength);
+        clinker._clinkerPopupContentOrganizationCaCert.textContent  = ("           :" + clinker_CertificateSignatureAlgrithm + " " + clinker_CertificateSignatureValue[4] + " bit" + clinker_CertificateSignatureStrength);
+        clinker._clinkerPopupContentOrganizationLocation.textContent  = ("           :" + clinker_SubjectsPublicKeyLocationCity + clinker_SubjectsPublicKeyLocationState + clinker_SubjectsPublicKeyLocationCountry);
+        clinker._clinkerPopupContentIssuerLocation.textContent  = ("           :" + clinker_SubjectsCertificateLocationCity + clinker_SubjectsCertificateLocationState + clinker_SubjectsCertificateLocationCountry);
 
     }
 
           // setup the default strings for the drop down menu cipher suite values
-          calomelsslvalidation._calomelPopupContentCertificate.textContent = ("Certificate: " + calomel_ssl_cert_verification ); 
-          calomelsslvalidation._calomelPopupContentCiphersuite.textContent =  ("\nCiphersuite : " + symetricCipher );
-          calomelsslvalidation._calomelPopupContentPfs.textContent         =  ("\nPerfect Forward Secrecy [PFS]:  NO  ( 0/20)");
-          calomelsslvalidation._calomelPopupContentKeyExchange.textContent =  ("Key Exchange: unknown");
-          calomelsslvalidation._calomelPopupContentSignature.textContent   =  ("Signature   : unknown");
-          calomelsslvalidation._calomelPopupContentBulkCipher.textContent  =  ("Bulk Cipher : unknown");
-          calomelsslvalidation._calomelPopupContentMAC.textContent         =  ("MAC         : unknown");
+          clinker._clinkerPopupContentCertificate.textContent = ("Certificate: " + clinker_ssl_cert_verification );
+          clinker._clinkerPopupContentCiphersuite.textContent =  ("\nCiphersuite : " + symetricCipher );
+          clinker._clinkerPopupContentPfs.textContent         =  ("\nPerfect Forward Secrecy [PFS]:  NO  ( 0/20)");
+          clinker._clinkerPopupContentKeyExchange.textContent =  ("Key Exchange: unknown");
+          clinker._clinkerPopupContentSignature.textContent   =  ("Signature   : unknown");
+          clinker._clinkerPopupContentBulkCipher.textContent  =  ("Bulk Cipher : unknown");
+          clinker._clinkerPopupContentMAC.textContent         =  ("MAC         : unknown");
 
           // grade the key exchange
           if ( symetricCipher.contains("TLS_ECDHE_") ) {
-          calomelsslvalidation._calomelPopupContentPfs.textContent         =  ("\nPerfect Forward Secrecy [PFS]:  YES  (20/20)");
-          calomelsslvalidation._calomelPopupContentKeyExchange.textContent =  ("Key Exchange: ECDHE [PFS]      (25/25)");
-          calomel_conn_score += 45;
+          clinker._clinkerPopupContentPfs.textContent         =  ("\nPerfect Forward Secrecy [PFS]:  YES  (20/20)");
+          clinker._clinkerPopupContentKeyExchange.textContent =  ("Key Exchange: ECDHE [PFS]      (25/25)");
+          clinker_conn_score += 45;
           } else if ( symetricCipher.contains("TLS_DHE_") ) {
-          calomelsslvalidation._calomelPopupContentPfs.textContent         =  ("\nPerfect Forward Secrecy [PFS]:  YES  (20/20)");
-          calomelsslvalidation._calomelPopupContentKeyExchange.textContent =  ("Key Exchange: DHE [PFS]        (20/25)");
-          calomel_conn_score += 40; 
+          clinker._clinkerPopupContentPfs.textContent         =  ("\nPerfect Forward Secrecy [PFS]:  YES  (20/20)");
+          clinker._clinkerPopupContentKeyExchange.textContent =  ("Key Exchange: DHE [PFS]        (20/25)");
+          clinker_conn_score += 40;
           } else if ( symetricCipher.contains("TLS_ECDH_") ) {
-          calomelsslvalidation._calomelPopupContentKeyExchange.textContent =  ("Key Exchange: ECDH             (10/25)");
-          calomel_conn_score += 10; 
+          clinker._clinkerPopupContentKeyExchange.textContent =  ("Key Exchange: ECDH             (10/25)");
+          clinker_conn_score += 10;
           } else if ( symetricCipher.contains("TLS_DH_") ) {
-          calomelsslvalidation._calomelPopupContentKeyExchange.textContent =  ("Key Exchange: DH               ( 7/25)");
-          calomel_conn_score += 7; 
+          clinker._clinkerPopupContentKeyExchange.textContent =  ("Key Exchange: DH               ( 7/25)");
+          clinker_conn_score += 7;
           } else if ( symetricCipher.contains("TLS_RSA_WITH_") ) {
-          calomelsslvalidation._calomelPopupContentKeyExchange.textContent =  ("Key Exchange: RSA/server key   ( 3/25)");
-          calomel_conn_score += 3; 
+          clinker._clinkerPopupContentKeyExchange.textContent =  ("Key Exchange: RSA/server key   ( 3/25)");
+          clinker_conn_score += 3;
           } else if ( symetricCipher.contains("SSL_RSA_WITH_") ) {
-          calomelsslvalidation._calomelPopupContentKeyExchange.textContent =  ("Key Exchange: RSA/server key   ( 1/25)");
-          calomel_conn_score += 1; 
+          clinker._clinkerPopupContentKeyExchange.textContent =  ("Key Exchange: RSA/server key   ( 1/25)");
+          clinker_conn_score += 1;
           }
 
           // grade the signature
           if ( symetricCipher.contains("_ECDSA_WITH_") ) {
-          calomelsslvalidation._calomelPopupContentSignature.textContent   =  ("Signature   : ECDSA");
-       // calomelsslvalidation._calomelPopupContentSignature.textContent   =  ("Signature   : ECDSA            (13/13)");
-       // calomel_conn_score += 13;
+          clinker._clinkerPopupContentSignature.textContent   =  ("Signature   : ECDSA");
+       // clinker._clinkerPopupContentSignature.textContent   =  ("Signature   : ECDSA            (13/13)");
+       // clinker_conn_score += 13;
           } else if ( symetricCipher.contains("_RSA_WITH_") ) {
-          calomelsslvalidation._calomelPopupContentSignature.textContent   =  ("Signature   : RSA");
-       // calomelsslvalidation._calomelPopupContentSignature.textContent   =  ("Signature   : RSA              (10/13)");
-       // calomel_conn_score += 10;
+          clinker._clinkerPopupContentSignature.textContent   =  ("Signature   : RSA");
+       // clinker._clinkerPopupContentSignature.textContent   =  ("Signature   : RSA              (10/13)");
+       // clinker_conn_score += 10;
           }
  
           // grade the bulk cipher and bit length
           if ( symetricCipher.contains("_AES_256_") ) {
-          calomelsslvalidation._calomelPopupContentBulkCipher.textContent  =  ("Bulk Cipher : AES 256 bit      (15/15)");
-          calomel_conn_score += 15;
+          clinker._clinkerPopupContentBulkCipher.textContent  =  ("Bulk Cipher : AES 256 bit      (15/15)");
+          clinker_conn_score += 15;
           } else if ( symetricCipher.contains("_AES_128_") ) {
-          calomelsslvalidation._calomelPopupContentBulkCipher.textContent  =  ("Bulk Cipher : AES 128 bit      (15/15)");
-          calomel_conn_score += 15;
+          clinker._clinkerPopupContentBulkCipher.textContent  =  ("Bulk Cipher : AES 128 bit      (15/15)");
+          clinker_conn_score += 15;
           } else if ( symetricCipher.contains("_RC4_128_") ) {
-          calomelsslvalidation._calomelPopupContentBulkCipher.textContent  =  ("Bulk Cipher : RC4 128 bit      ( 4/15)");
-          calomel_conn_score += 4;
+          clinker._clinkerPopupContentBulkCipher.textContent  =  ("Bulk Cipher : RC4 128 bit      ( 4/15)");
+          clinker_conn_score += 4;
           } else if ( symetricCipher.contains("_3DES_") ) {
-          calomelsslvalidation._calomelPopupContentBulkCipher.textContent  =  ("Bulk Cipher : 3DES 168 bit     ( 4/15)");
-          calomel_conn_score += 4;
+          clinker._clinkerPopupContentBulkCipher.textContent  =  ("Bulk Cipher : 3DES 168 bit     ( 4/15)");
+          clinker_conn_score += 4;
           } else if ( symetricCipher.contains("_CAMELLIA_256_") ) {
-          calomelsslvalidation._calomelPopupContentBulkCipher.textContent  =  ("Bulk Cipher : Camellia 256 bit (15/15)");
-          calomel_conn_score += 15;
+          clinker._clinkerPopupContentBulkCipher.textContent  =  ("Bulk Cipher : Camellia 256 bit (15/15)");
+          clinker_conn_score += 15;
           } else if ( symetricCipher.contains("_CAMELLIA_128_") ) {
-          calomelsslvalidation._calomelPopupContentBulkCipher.textContent  =  ("Bulk Cipher : Camellia 128 bit (15/15)");
-          calomel_conn_score += 15;
+          clinker._clinkerPopupContentBulkCipher.textContent  =  ("Bulk Cipher : Camellia 128 bit (15/15)");
+          clinker_conn_score += 15;
           }
 
           // grade the a Message Authentication Code (MAC)
           if ( symetricCipher.contains("_GCM_SHA256") ) {
-          calomelsslvalidation._calomelPopupContentMAC.textContent         =  ("MAC         : SHA-256 AEAD GCM (20/20)");
-          calomel_conn_score += 20;
+          clinker._clinkerPopupContentMAC.textContent         =  ("MAC         : SHA-256 AEAD GCM (20/20)");
+          clinker_conn_score += 20;
           } else if ( symetricCipher.contains("_GCM_SHA384") ) {
-          calomelsslvalidation._calomelPopupContentMAC.textContent         =  ("MAC         : SHA-384 AEAD GCM (20/20)");
-          calomel_conn_score += 20;
+          clinker._clinkerPopupContentMAC.textContent         =  ("MAC         : SHA-384 AEAD GCM (20/20)");
+          clinker_conn_score += 20;
           } else if ( symetricCipher.contains("_SHA384") ) {
-          calomelsslvalidation._calomelPopupContentMAC.textContent         =  ("MAC         : SHA-384          (10/20)");
-          calomel_conn_score += 10;
+          clinker._clinkerPopupContentMAC.textContent         =  ("MAC         : SHA-384          (10/20)");
+          clinker_conn_score += 10;
           } else if ( symetricCipher.contains("_SHA256") ) {
-          calomelsslvalidation._calomelPopupContentMAC.textContent         =  ("MAC         : SHA-256          (10/20)");
-          calomel_conn_score += 10;
+          clinker._clinkerPopupContentMAC.textContent         =  ("MAC         : SHA-256          (10/20)");
+          clinker_conn_score += 10;
           } else if ( symetricCipher.contains("_MD5") ) {
-          calomelsslvalidation._calomelPopupContentMAC.textContent         =  ("MAC         : MD5              ( 1/20)");
-          calomel_conn_score += 1;
+          clinker._clinkerPopupContentMAC.textContent         =  ("MAC         : MD5              ( 1/20)");
+          clinker_conn_score += 1;
           } else if ( symetricCipher.contains("_SHA") ) {
-          calomelsslvalidation._calomelPopupContentMAC.textContent         =  ("MAC         : SHA-1            ( 8/20)");
-          calomel_conn_score += 8; }
+          clinker._clinkerPopupContentMAC.textContent         =  ("MAC         : SHA-1            ( 8/20)");
+          clinker_conn_score += 8; }
 
        }
 
 
        // Is the connection secure? 
-       if (calomel_conn_score >= 90 ) {
-         calomelsslvalidation._calomelPopupContentSecure.textContent = ("Security   : " + "Very Strong (green " + calomel_conn_score + "%)");
-         document.getElementById("calomelsslvalidation-urlicon").image="chrome://calomelsslvalidation/skin/calomelsslvalidation_green_button.png";
-       } else if (calomel_conn_score >= 80 && calomel_conn_score <= 89 ) {
-         calomelsslvalidation._calomelPopupContentSecure.textContent = ("Security   : " + "Strong (blue " + calomel_conn_score + "%)");
-         document.getElementById("calomelsslvalidation-urlicon").image="chrome://calomelsslvalidation/skin/calomelsslvalidation_blue_button.png";
-       } else if (calomel_conn_score >= 70 && calomel_conn_score <= 79 ) {
-         calomelsslvalidation._calomelPopupContentSecure.textContent = ("Security   : " + "Moderate (yellow " + calomel_conn_score + "%)");
-         document.getElementById("calomelsslvalidation-urlicon").image="chrome://calomelsslvalidation/skin/calomelsslvalidation_yellow_button.png";
-   //  } else if (calomel_conn_score >= 50 && calomel_conn_score <= 69 ) {
-   //    calomelsslvalidation._calomelPopupContentSecure.textContent = ("Security   : " + "Weak (orange " + calomel_conn_score + "%)");
-   //    document.getElementById("calomelsslvalidation-urlicon").image="chrome://calomelsslvalidation/skin/calomelsslvalidation_orange_button.png";
-       } else if (calomel_conn_score <= 69 ) {
-         calomelsslvalidation._calomelPopupContentSecure.textContent = ("Security   : " + "WARNING! Very Weak (red " + calomel_conn_score + "%)");
-         document.getElementById("calomelsslvalidation-urlicon").image="chrome://calomelsslvalidation/skin/calomelsslvalidation_red_button.png";
+       if (clinker_conn_score >= 90 ) {
+         clinker._clinkerPopupContentSecure.textContent = ("Security   : " + "Very Strong (green " + clinker_conn_score + "%)");
+         document.getElementById("clinker-urlicon").image="chrome://clinker/skin/clinker_green_button.png";
+       } else if (clinker_conn_score >= 80 && clinker_conn_score <= 89 ) {
+         clinker._clinkerPopupContentSecure.textContent = ("Security   : " + "Strong (blue " + clinker_conn_score + "%)");
+         document.getElementById("clinker-urlicon").image="chrome://clinker/skin/clinker_blue_button.png";
+       } else if (clinker_conn_score >= 70 && clinker_conn_score <= 79 ) {
+         clinker._clinkerPopupContentSecure.textContent = ("Security   : " + "Moderate (yellow " + clinker_conn_score + "%)");
+         document.getElementById("clinker-urlicon").image="chrome://clinker/skin/clinker_yellow_button.png";
+   //  } else if (clinker_conn_score >= 50 && clinker_conn_score <= 69 ) {
+   //    clinker._clinkerPopupContentSecure.textContent = ("Security   : " + "Weak (orange " + clinker_conn_score + "%)");
+   //    document.getElementById("clinker-urlicon").image="chrome://clinker/skin/clinker_orange_button.png";
+       } else if (clinker_conn_score <= 69 ) {
+         clinker._clinkerPopupContentSecure.textContent = ("Security   : " + "WARNING! Very Weak (red " + clinker_conn_score + "%)");
+         document.getElementById("clinker-urlicon").image="chrome://clinker/skin/clinker_red_button.png";
        }
 
        // if the ssl connection is just plain broke
        if (ui.state & ci.nsIWebProgressListener.STATE_IS_INSECURE || ui.state & ci.nsIWebProgressListener.STATE_IS_BROKEN) {
-         calomel_conn_score = 0;
-         calomelsslvalidation._calomelPopupContentSecure.textContent = ("Security   : " + "WARNING! BROKEN or UNTRUSTED (red " + calomel_conn_score + "%)");
-         document.getElementById("calomelsslvalidation-urlicon").image="chrome://calomelsslvalidation/skin/calomelsslvalidation_redbroke_button.png";
+         clinker_conn_score = 0;
+         clinker._clinkerPopupContentSecure.textContent = ("Security   : " + "WARNING! BROKEN or UNTRUSTED (red " + clinker_conn_score + "%)");
+         document.getElementById("clinker-urlicon").image="chrome://clinker/skin/clinker_redbroke_button.png";
        }
      }
 
      // http clear connections
-     if (calomel_url_protocol == "http:") {
-       var calomel_url_hostname = window.content.location.hostname;
-       calomelsslvalidation._calomelPopupContentHost.textContent   = ("URL Host   : " + calomel_url_hostname);
-       calomelsslvalidation._calomelPopupContentSecure.textContent = ("Security   : " + "None - Unsecured");
-       calomelsslvalidation._calomelPopupContentCurrentDate.textContent        = (new Date());
-       document.getElementById("calomelsslvalidation-urlicon").image="chrome://calomelsslvalidation/skin/calomelsslvalidation_grey_button.png";
+     if (clinker_url_protocol == "http:") {
+       var clinker_url_hostname = window.content.location.hostname;
+       clinker._clinkerPopupContentHost.textContent   = ("URL Host   : " + clinker_url_hostname);
+       clinker._clinkerPopupContentSecure.textContent = ("Security   : " + "None - Unsecured");
+       clinker._clinkerPopupContentCurrentDate.textContent        = (new Date());
+       document.getElementById("clinker-urlicon").image="chrome://clinker/skin/clinker_grey_button.png";
       }
 
    },

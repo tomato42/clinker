@@ -1,68 +1,68 @@
-#calomelsslvalidation-urlicon,
-toolbar[iconsize="small"] #calomelsslvalidation-urlicon,
-#calomelsslvalidation-urlicon > .toolbarbutton-menubutton-button {
+#clinker-urlicon,
+toolbar[iconsize="small"] #clinker-urlicon,
+#clinker-urlicon > .toolbarbutton-menubutton-button {
   padding: 0px !important;
-  list-style-image: url("chrome://calomelsslvalidation/skin/calomelsslvalidation_grey_button.png");
+  list-style-image: url("chrome://clinker/skin/clinker_grey_button.png");
   -moz-appearance: none !important;
 }
 
-#calomelsslvalidation-popup-container {
-  background-image: url("chrome://calomelsslvalidation/skin/calomelsslvalidation_popup_bg.png"); 
+#clinker-popup-container {
+  background-image: url("chrome://clinker/skin/clinker_popup_bg.png");
   min-width: 450px;
   border-color: #CCCCCC;
   border-style: solid; 
 }
 
-#calomelsslvalidation-popup-icon {
+#clinker-popup-icon {
   height: 100px;
   width: 101px;
-  background-image: url("chrome://calomelsslvalidation/skin/calomelsslvalidation_popup_icon.png");
+  background-image: url("chrome://clinker/skin/clinker_popup_icon.png");
 }
 
-#calomelsslvalidation-popup-content-box {
+#clinker-popup-content-box {
   white-space: pre-wrap;
 }
 
-#calomelsslvalidation-popup-content-cert-type,
-#calomelsslvalidation-popup-content-issuer-location,
-#calomelsslvalidation-popup-content-organization-location,
-#calomelsslvalidation-popup-content-organization-cacert,
-#calomelsslvalidation-popup-content-organization-subcert,
-#calomelsslvalidation-popup-content-certificate,
-#calomelsslvalidation-popup-content-commonname,
-#calomelsslvalidation-popup-content-organization,
-#calomelsslvalidation-popup-content-issuer,
-#calomelsslvalidation-popup-content-before-date,
-#calomelsslvalidation-popup-content-after-date,
-#calomelsslvalidation-popup-content-pfs,
-#calomelsslvalidation-popup-content-ciphersuite,
-#calomelsslvalidation-popup-content-key_exchange,
-#calomelsslvalidation-popup-content-signature,
-#calomelsslvalidation-popup-content-bulk_cipher,
-#calomelsslvalidation-popup-content-mac,
-#calomelsslvalidation-popup-content-secure,
-#calomelsslvalidation-popup-content-host {
+#clinker-popup-content-cert-type,
+#clinker-popup-content-issuer-location,
+#clinker-popup-content-organization-location,
+#clinker-popup-content-organization-cacert,
+#clinker-popup-content-organization-subcert,
+#clinker-popup-content-certificate,
+#clinker-popup-content-commonname,
+#clinker-popup-content-organization,
+#clinker-popup-content-issuer,
+#clinker-popup-content-before-date,
+#clinker-popup-content-after-date,
+#clinker-popup-content-pfs,
+#clinker-popup-content-ciphersuite,
+#clinker-popup-content-key_exchange,
+#clinker-popup-content-signature,
+#clinker-popup-content-bulk_cipher,
+#clinker-popup-content-mac,
+#clinker-popup-content-secure,
+#clinker-popup-content-host {
   color: #000000;
   font-family:monospace;
   max-width: 450px;
 }
 
-#calomelsslvalidation-calomel_ssl_validation_title {
+#clinker-clinker_ssl_validation_title {
   color: #000000;
   font-family:Verdana;
   font-size:150%;
   max-width: 450px;
 }
 
-#calomelsslvalidation-popup-content-current-date,
-#calomelsslvalidation-calomel_ssl_validation_homepage {
+#clinker-popup-content-current-date,
+#clinker-clinker_ssl_validation_homepage {
   color: #000000;
   font-family:Verdana;
   font-size: 90%;
   max-width: 450px;
 }
 
-#calomelsslvalidation-calomel_ssl_validation_homepage:hover {
+#clinker-clinker_ssl_validation_homepage:hover {
   color: #0000ff;
   font-family:Verdana;
   font-size: 90%;

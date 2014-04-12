@@ -1,34 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
-<!DOCTYPE prefwindow SYSTEM "chrome://calomelsslvalidation/locale/options.dtd">
-<prefwindow id="calomelsslvalidation-preferences" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" buttons="accept,cancel" title="&prefwindow.title;">
-<script src="chrome://calomelsslvalidation/content/calomelsslvalidation.js"/>
+<!DOCTYPE prefwindow SYSTEM "chrome://clinker/locale/options.dtd">
+<prefwindow id="clinker-preferences" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" buttons="accept,cancel" title="&prefwindow.title;">
+<script src="chrome://clinker/content/clinker.js"/>
   <prefpane id="pane1" label="&pane1.title;">
     <preferences>
-      <preference id="ciphers_256pfs_pref" name="extensions.calomelsslvalidation.ciphers_256pfs" type="bool"/>
-      <preference id="ciphers_128pfs_pref" name="extensions.calomelsslvalidation.ciphers_128pfs" type="bool"/>
-      <preference id="ciphers_128_pref" name="extensions.calomelsslvalidation.ciphers_128" type="bool"/>
-      <preference id="ciphers_all_pref" name="extensions.calomelsslvalidation.ciphers_all" type="bool"/>
-      <preference id="ocsp_pref" name="extensions.calomelsslvalidation.ocsp" type="bool"/>
-      <preference id="tls_pref" name="extensions.calomelsslvalidation.tls" type="bool"/>
-      <preference id="anim_mode_pref" name="extensions.calomelsslvalidation.animations" type="bool"/>
-      <preference id="tool_tips_pref" name="extensions.calomelsslvalidation.tool_tips" type="bool"/>
-      <preference id="proxy_dns_pref" name="extensions.calomelsslvalidation.proxy_dns" type="bool"/>
-      <preference id="paint_delay_pref" name="extensions.calomelsslvalidation.paint_delay" type="bool"/>
-      <preference id="safe_browsing_pref" name="extensions.calomelsslvalidation.safe_browsing" type="bool"/>
-      <preference id="home_on_update_pref" name="extensions.calomelsslvalidation.home_on_update" type="bool"/>
-      <preference id="prefetch_pref" name="extensions.calomelsslvalidation.prefetch" type="bool"/>
-      <preference id="dns_prefetch_pref" name="extensions.calomelsslvalidation.dns_prefetch" type="bool"/>
-      <preference id="tab_title_pref" name="extensions.calomelsslvalidation.tab_title" type="bool"/>
-      <preference id="geo_locate_pref" name="extensions.calomelsslvalidation.geo_locate" type="bool"/>
-      <preference id="spelling_pref" name="extensions.calomelsslvalidation.spelling" type="bool"/>
-      <preference id="mem_cache_pref" name="extensions.calomelsslvalidation.mem_cache" type="bool"/>
-      <preference id="url_guess_pref" name="extensions.calomelsslvalidation.url_guess" type="bool"/>
-      <preference id="dns_cache_pref" name="extensions.calomelsslvalidation.dns_cache" type="bool"/>
-      <preference id="send_referer_pref" name="extensions.calomelsslvalidation.send_referer" type="bool"/>
-      <preference id="user_agent_pref" name="extensions.calomelsslvalidation.user_agent" type="bool"/>
+      <preference id="ciphers_256pfs_pref" name="extensions.clinker.ciphers_256pfs" type="bool"/>
+      <preference id="ciphers_128pfs_pref" name="extensions.clinker.ciphers_128pfs" type="bool"/>
+      <preference id="ciphers_128_pref" name="extensions.clinker.ciphers_128" type="bool"/>
+      <preference id="ciphers_all_pref" name="extensions.clinker.ciphers_all" type="bool"/>
+      <preference id="ocsp_pref" name="extensions.clinker.ocsp" type="bool"/>
+      <preference id="tls_pref" name="extensions.clinker.tls" type="bool"/>
+      <preference id="anim_mode_pref" name="extensions.clinker.animations" type="bool"/>
+      <preference id="tool_tips_pref" name="extensions.clinker.tool_tips" type="bool"/>
+      <preference id="proxy_dns_pref" name="extensions.clinker.proxy_dns" type="bool"/>
+      <preference id="paint_delay_pref" name="extensions.clinker.paint_delay" type="bool"/>
+      <preference id="safe_browsing_pref" name="extensions.clinker.safe_browsing" type="bool"/>
+      <preference id="home_on_update_pref" name="extensions.clinker.home_on_update" type="bool"/>
+      <preference id="prefetch_pref" name="extensions.clinker.prefetch" type="bool"/>
+      <preference id="dns_prefetch_pref" name="extensions.clinker.dns_prefetch" type="bool"/>
+      <preference id="tab_title_pref" name="extensions.clinker.tab_title" type="bool"/>
+      <preference id="geo_locate_pref" name="extensions.clinker.geo_locate" type="bool"/>
+      <preference id="spelling_pref" name="extensions.clinker.spelling" type="bool"/>
+      <preference id="mem_cache_pref" name="extensions.clinker.mem_cache" type="bool"/>
+      <preference id="url_guess_pref" name="extensions.clinker.url_guess" type="bool"/>
+      <preference id="dns_cache_pref" name="extensions.clinker.dns_cache" type="bool"/>
+      <preference id="send_referer_pref" name="extensions.clinker.send_referer" type="bool"/>
+      <preference id="user_agent_pref" name="extensions.clinker.user_agent" type="bool"/>
     </preferences>
-    <!--    <image src="chrome://calomelsslvalidation/skin/calomelsslvalidation_menu_top.png" validate="never" /> -->
+    <!--    <image src="chrome://clinker/skin/clinker_menu_top.png" validate="never" /> -->
     <description flex="1" style="min-height: 2em"> &options.description_top; </description>
     <tabbox>
      <tabs>
@@ -71,7 +71,7 @@
          <checkbox id="dns_cache_check" preference="dns_cache_pref" label="&dns_cache_pref.label;"/>
        </tabpanel>
        <tabpanel id="abouttab" orient="vertical">
-         <description>Clinker SSL Validation</description>
+         <description>Clinker TLS Validator</description>
          <spacer style="min-height: 1em;" />
          <checkbox id="home_on_update_check" preference="home_on_update_pref" label="&home_on_update_pref.label;"/>
          <spacer style="min-height: 1em;" />
@@ -80,7 +80,7 @@
        </tabpanel>
      </tabpanels>
     </tabbox>
-    <button id="apply_button" label="Apply Changes Now" onclick="calomelsslvalidation.startFirefox()" />
+    <button id="apply_button" label="Apply Changes Now" onclick="clinker.startFirefox()" />
 
   </prefpane>
 </prefwindow>

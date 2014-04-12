@@ -3,13 +3,13 @@
   <Description about="urn:mozilla:install-manifest">
     <em:id>clinker@tomato42</em:id>
     <em:type>2</em:type>
-    <em:name>Clinker SSL Validation</em:name>
+    <em:name>Clinker TLS Validator</em:name>
     <em:version>0.0.1</em:version>
     <em:creator>Tomato42</em:creator>
     <em:homepageURL>https://github.com/tomato42/clinker</em:homepageURL>
     <em:contributor></em:contributor>
     <em:description>Estimate security of the SSL connection.</em:description>
-    <em:optionsURL>chrome://calomelsslvalidation/content/options.xul</em:optionsURL>
+    <em:optionsURL>chrome://clinker/content/options.xul</em:optionsURL>
     <em:targetApplication>
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id> <!-- Firefox -->
