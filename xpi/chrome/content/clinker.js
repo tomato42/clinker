@@ -4,7 +4,7 @@
  *
  * Previously
  * Calomel SSL Validation
- *    https://clinker.org
+ *    https://calomel.org
  */
 
 var clinker = {
