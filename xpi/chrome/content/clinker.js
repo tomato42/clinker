@@ -33,7 +33,7 @@ var clinkerCryptoEstimator = function() {
     // lowest level of security of keys in cert chain
     this.lowestCertKeyLoS = null;
     // weakest algorithm type used in certificates (MD5, SHA-1, SHA-256, etc.)
-    this.weakestSigType = null;
+    this.lowestSignatureLoS = null;
 }
 clinkerCryptoEstimator.prototype.setKeyExchange = function(val) {
     this.kex = val;
@@ -41,21 +41,45 @@ clinkerCryptoEstimator.prototype.setKeyExchange = function(val) {
 clinkerCryptoEstimator.prototype.setBulkCipher = function(val) {
     this.bulkCipher = val;
 }
+clinkerCryptoEstimator.prototype.hashSecurityEstimator = function(val) {
+    if (val == "MD5") {
+        return 64;
+    } else if (val == "SHA1") {
+        return 80;
+    } else if (val == "SHA256") {
+        return 128;
+    } else if (val == "SHA512") {
+        return 256;
+    } else {
+        return 0;
+    }
+}
+clinkerCryptoEstimator.prototype.setSigHash = function(val) {
+    if (this.lowestSignatureLoS == null) {
+        this.lowestSignatureLoS = this.hashSecurityEstimator(val);
+        return;
+    }
+
+    var newLoS = this.hashSecurityEstimator(val);
+    if (this.lowestSignatureLoS > newLoS) {
+        this.lowestSignatureLoS = newLoS;
+    }
+}
 clinkerCryptoEstimator.prototype.rsaLoSEstimator = function(val) {
     var keyLoS;
 
     // the difference in complexity of attack on RSA primes of
     // n and n-10 bit size are minimal and certificates that use
     // nonstandard sizes are quite common, so average the sizes
-    if (size < 1020) { // 1024 == 80 bit
+    if (val < 1020) { // 1024 == 80 bit
         keyLoS = 64;
-    } else if (size < 2040) { // 2048 == 112 bit
+    } else if (val < 2040) { // 2048 == 112 bit
         keyLoS = 80;
-    } else if (size < 3068) { // 3072 == 128 bit
+    } else if (val < 3068) { // 3072 == 128 bit
         keyLoS = 112;
-    } else if (size < 7660) { // 7680 == 192 bit
+    } else if (val < 7660) { // 7680 == 192 bit
         keyLoS = 128;
-    } else if (size < 15300) { // 15360 == 256 bit
+    } else if (val < 15300) { // 15360 == 256 bit
         keyLoS = 192;
     } else {
         keyLoS = 256;
@@ -63,17 +87,18 @@ clinkerCryptoEstimator.prototype.rsaLoSEstimator = function(val) {
     return keyLoS;
 }
 clinkerCryptoEstimator.prototype.addCertKey = function(type, size) {
+    var keyLoS;
     if (type == "ECDSA") {
-        keyLoS = size / 2;
-    } else if (type == "RSA") {
-        keyLoS = this.rsaLoSEstimator(size);
-    } else {
-        alert("Clinker: Unknown certificate type: ".concat(type));
-        return;
+        //keyLoS = size / 2;
+        keyLoS = 112
+    } else if (type == "RSA" || type == "DSA") {
+       keyLoS = this.rsaLoSEstimator(size);
     }
+
     if (this.lowestCertKeyLoS == null || this.lowestCertKeyLoS > keyLoS) {
-        this.lowestCertKeyLoS = keyLos;
+        this.lowestCertKeyLoS = keyLoS;
     }
+    return;
 }
 clinkerCryptoEstimator.prototype.setServerKey = function(type, size) {
     this.serverKeyType = type;
@@ -141,9 +166,20 @@ clinkerCryptoEstimator.prototype.isKeyExchangeForwardSecure = function() {
     }
     return false;
 }
+clinkerCryptoEstimator.prototype.getAuthenticationLoS = function() {
+    var los = null;
+
+    los = this.lowestSignatureLoS;
+
+    if (los == null || los > this.lowestCertKeyLoS) {
+        los = this.lowestCertKeyLoS;
+    }
+
+    return los;
+}
 clinkerCryptoEstimator.prototype.isRecommendedPractice = function() {
-    if (this.integrity == "AEAD" && this.getCipherLoS() >= 128 &&
-            this.getAuthenticationLoS() >= 128) {
+    if (this.integrity == "AEAD" && this.getEncryptionLoS() >= 128 &&
+            this.getAuthenticationLoS() >= 112 && this.isKeyExchangeForwardSecure()) {
         return true;
     }
     return false;
@@ -764,18 +800,23 @@ var clinker = {
          if  (clinker_SubjectPublicKeyAlgorithm.indexOf("SHA") && clinker_SubjectsPublicKey == "Curve" && ( clinker_SubjectPublicKeyAlgorithm.contains("SHA-256") || clinker_SubjectPublicKeyAlgorithm.contains("SHA-512") ) ) {
                clinker_SubjectPublicKeyStrength = " (10/10)";
                clinker_conn_score += 10;
+             estimator.setSigHash("SHA256");
          } else if  (clinker_SubjectPublicKeyAlgorithm.indexOf("SHA") && parseInt(clinker_SubjectsPublicKey) > 2047 && ( clinker_SubjectPublicKeyAlgorithm.contains("SHA-256") || clinker_SubjectPublicKeyAlgorithm.contains("SHA-512") ) ) {
                clinker_SubjectPublicKeyStrength = " (10/10)";
                clinker_conn_score += 10;
+             estimator.setSigHash("SHA256");
          } else if  (clinker_SubjectPublicKeyAlgorithm.indexOf("SHA") && clinker_SubjectsPublicKey == "Curve" && clinker_SubjectPublicKeyAlgorithm.contains("SHA-1") ) {
                clinker_SubjectPublicKeyStrength = " (4/10)";
                clinker_conn_score += 4;
+             estimator.setSigHash("SHA1");
          } else if  (clinker_SubjectPublicKeyAlgorithm.indexOf("SHA") && parseInt(clinker_SubjectsPublicKey) > 2047 && clinker_SubjectPublicKeyAlgorithm.contains("SHA-1") ) {
                clinker_SubjectPublicKeyStrength = " (4/10)";
                clinker_conn_score += 4;
+             estimator.setSigHash("SHA1");
          } else {
              clinker_SubjectPublicKeyStrength = " (0/10)";
          }
+         estimator.setServerKey("RSA", parseInt(clinker_SubjectsPublicKey));
 
         // grade the stength of the certificate authorities hashes
          if (clinker_CertificateSignatureAlgrithm.indexOf("SHA") && clinker_CertificateSignatureValue[4] == "Curve" && (clinker_CertificateSignatureAlgrithm.contains("SHA-256") || clinker_CertificateSignatureAlgrithm.contains("SHA-512") ) ) {
@@ -916,10 +957,12 @@ var clinker = {
          document.getElementById("clinker-urlicon").image="chrome://clinker/skin/clinker_red_button.png";
        }
 
+       // provide information about long term confidentiality of connection
+       // (pasive MITM attack)
        var longTerm = estimator.getEncryptionLoS();
        var encryptionComment;
        if (longTerm < 80) {
-           encryptionComment = "(Broken)";
+           encryptionComment = "(BROKEN)";
        } else if (longTerm < 112) {
            encryptionComment = "(insecure)";
        } else if (longTerm < 128) {
@@ -927,8 +970,21 @@ var clinker = {
        } else {
            encryptionComment = "(secure for forseeable future)";
        }
-
        clinker._clinkerPopupContentSecure.textContent = ("Confidentiality : ").concat(longTerm).concat(" bit ").concat(encryptionComment);
+
+
+       var authenticationLoS = estimator.getAuthenticationLoS();
+       var authenticationComment;
+       if (authenticationLoS < 80) {
+           authenticationComment = "(BROKEN)";
+       } else if (authenticationLoS < 112) {
+           authenticationComment = "(insecure)";
+       } else if (authenticationLoS < 128) {
+           authenticationComment = "(secure up to around 20XX)";
+       } else {
+           authenticationComment = "(secure for forseeable future)";
+       }
+       clinker._clinkerPopupContentCertificate.textContent = ("Authentication : ").concat(authenticationLoS).concat(" bit ").concat(authenticationComment);
 
        // if the ssl connection is just plain broke
        if (ui.state & ci.nsIWebProgressListener.STATE_IS_INSECURE || ui.state & ci.nsIWebProgressListener.STATE_IS_BROKEN) {
