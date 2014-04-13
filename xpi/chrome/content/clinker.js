@@ -1142,18 +1142,8 @@ var clinker = {
                 var clinker_date_validity =
                     clinker_ssl_cert.validity
                     .QueryInterface(ci.nsIX509CertValidity);
-                var clinker_ssl_cert_verification;
                 if (status && !insecureSSL) {
                     status.QueryInterface(ci.nsISSLStatus);
-                }
-
-                // Check ssl certificate security state flags
-                if (Ci.nsIWebProgressListener.STATE_IS_SECURE) {
-                    clinker_ssl_cert_verification = "Verified";
-                } else if (Ci.nsIWebProgressListener.STATE_IS_INSECURE) {
-                    clinker_ssl_cert_verification = "WARNING! not trusted";
-                } else {
-                    clinker_ssl_cert_verification = "WARNING! broken";
                 }
 
                 // does the url hostname and certificate common name match?
@@ -1189,6 +1179,9 @@ var clinker = {
             } else if (ui.state & ci.nsIWebProgressListener.STATE_IS_SECURE) {
                 clinker._clinkerPopupContentCertType.textContent =
                     ("Class           : Domain Validation (DV)");
+            } else {
+                clinker._clinkerPopupContentCertType.textContent =
+                    ("Class           : Untrusted");
             }
 
             // retrive the ssl cipher and key length
@@ -1199,8 +1192,6 @@ var clinker = {
 
             // popup the ssl information if the connection is properly encrypted
             if (symetricCipher && symetricKeyLength ) {
-                var clinker_key_strength = null;
-                var clinker_cipher_strength = null;
 
                 // get extended certificate information
                 var serverCert = status.serverCert;
