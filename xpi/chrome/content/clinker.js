@@ -143,6 +143,22 @@ clinkerCryptoEstimator.prototype.getServerKeyLoS = function() {
     return 0;
 }
 
+clinkerCryptoEstimator.prototype.getServerKeyType = function() {
+    if (this.serverKeyType == null) {
+        return "Unknown";
+    } else {
+        return this.serverKeyType;
+    }
+}
+
+clinkerCryptoEstimator.prototype.getServerKeySize = function() {
+    if (this.serverKeySize == null) {
+        return 0;
+    } else {
+        return this.serverKeySize;
+    }
+}
+
 clinkerCryptoEstimator.prototype.setIntegrityMechanism = function(type, los) {
     this.integrity = type;
     this.integrityLoS = los;
@@ -238,6 +254,75 @@ clinkerCryptoEstimator.prototype.isRecommendedPractice = function() {
             return true;
     }
     return false;
+}
+
+clinkerCryptoEstimator.prototype.setCipherSuite = function(ciphersuite) {
+
+    // grade the key exchange
+    if ( ciphersuite.contains("TLS_ECDHE_") ) {
+        this.setKeyExchange("ECDHE");
+    } else if ( ciphersuite.contains("TLS_DHE_") ) {
+        this.setKeyExchange("DHE");
+    } else if ( ciphersuite.contains("TLS_ECDH_") ) {
+        this.setKeyExchange("ECDH");
+    } else if ( ciphersuite.contains("TLS_DH_") ) {
+        this.setKeyExchange("DH");
+    } else if ( ciphersuite.contains("TLS_RSA_WITH_") ) {
+        this.setKeyExchange("RSA");
+    } else if ( ciphersuite.contains("SSL_RSA_WITH_") ) {
+        this.setKeyExchange("RSA");
+    }
+
+    // extract bulk cipher
+    if ( ciphersuite.contains("_AES_256_") ) {
+        this.setBulkCipher("AES-256");
+    } else if ( ciphersuite.contains("_AES_128_") ) {
+        this.setBulkCipher("AES-128");
+    } else if ( ciphersuite.contains("_RC4_128_") ) {
+        this.setBulkCipher("RC4");
+    } else if ( ciphersuite.contains("_3DES_") ) {
+        this.setBulkCipher("3DES");
+    } else if ( ciphersuite.contains("_CAMELLIA_256_") ) {
+        this.setBulkCipher("CAMELLIA-256");
+    } else if ( ciphersuite.contains("_CAMELLIA_128_") ) {
+        this.setBulkCipher("CAMELLIA-128");
+    }
+
+    // extract server key type
+    if ( ciphersuite.contains("_ECDSA_WITH_") ) {
+        this.serverKeyType = "ECDSA";
+    } else if ( ciphersuite.contains("_RSA_WITH_") ) {
+        this.serverKeyType = "RSA";
+    } else if ( ciphersuite.contains("_DSS_WITH_") ) {
+        this.serverKeyType = "DSA";
+    }
+
+    // save the integrity mechanism
+    if ( ciphersuite.contains("_GCM_SHA256") ) {
+        this.setPseudoRandomFunction("SHA256");
+        this.setIntegrityMechanism("AEAD",
+            this.getCipherLoS());
+    } else if ( ciphersuite.contains("_GCM_SHA384") ) {
+        this.setPseudoRandomFunction("SHA384");
+        this.setIntegrityMechanism("AEAD",
+            this.getCipherLoS());
+    } else if ( ciphersuite.contains("_SHA384") ) {
+        this.setPseudoRandomFunction("SHA384");
+        this.setIntegrityMechanism("SHA384 HMAC",
+            this.getPseudoRandomFunctionLoS());
+    } else if ( ciphersuite.contains("_SHA256") ) {
+        this.setPseudoRandomFunction("SHA256");
+        this.setIntegrityMechanism("SHA256 HMAC",
+            this.getPseudoRandomFunctionLoS());
+    } else if ( ciphersuite.contains("_MD5") ) {
+        this.setPseudoRandomFunction("MD5");
+        this.setIntegrityMechanism("MD5 HMAC",
+            this.getPseudoRandomFunctionLoS());
+    } else if ( ciphersuite.contains("_SHA") ) {
+        this.setPseudoRandomFunction("SHA1");
+        this.setIntegrityMechanism("SHA1 HMAC",
+            this.getPseudoRandomFunctionLoS());
+    }
 }
 
 var clinker = {
@@ -1287,20 +1372,7 @@ var clinker = {
                 clinker._clinkerPopupContentMAC.textContent =
                     ("MAC         : unknown");
 
-                // grade the key exchange
-                if ( symetricCipher.contains("TLS_ECDHE_") ) {
-                    estimator.setKeyExchange("ECDHE");
-                } else if ( symetricCipher.contains("TLS_DHE_") ) {
-                    estimator.setKeyExchange("DHE");
-                } else if ( symetricCipher.contains("TLS_ECDH_") ) {
-                    estimator.setKeyExchange("ECDH");
-                } else if ( symetricCipher.contains("TLS_DH_") ) {
-                    estimator.setKeyExchange("DH");
-                } else if ( symetricCipher.contains("TLS_RSA_WITH_") ) {
-                    estimator.setKeyExchange("RSA");
-                } else if ( symetricCipher.contains("SSL_RSA_WITH_") ) {
-                    estimator.setKeyExchange("RSA");
-                }
+                estimator.setCipherSuite(symetricCipher);
 
                 if (estimator.isKeyExchangeForwardSecure()) {
                     clinker._clinkerPopupContentPfs.textContent =
@@ -1338,63 +1410,32 @@ var clinker = {
                          + estimator.getServerKeyLoS()
                          + " bit)");
                 }
+                var keyType = String(estimator.getServerKeySize()
+                    + " bit " + estimator.getServerKeyType()
+                    + "                 ").slice(0,17);
 
-                // extract bulk cipher
-                if ( symetricCipher.contains("_AES_256_") ) {
-                    estimator.setBulkCipher("AES-256");
-                } else if ( symetricCipher.contains("_AES_128_") ) {
-                    estimator.setBulkCipher("AES-128");
-                } else if ( symetricCipher.contains("_RC4_128_") ) {
-                    estimator.setBulkCipher("RC4");
-                } else if ( symetricCipher.contains("_3DES_") ) {
-                    estimator.setBulkCipher("3DES");
-                } else if ( symetricCipher.contains("_CAMELLIA_256_") ) {
-                    estimator.setBulkCipher("CAMELLIA-256");
-                } else if ( symetricCipher.contains("_CAMELLIA_128_") ) {
-                    estimator.setBulkCipher("CAMELLIA-128");
-                }
+                clinker._clinkerPopupContentSignature.textContent =
+                    "Server key  : " + keyType + "("
+                    + estimator.getServerKeyLoS() + " bit)";
+
 
                 // set the detailed popup info for cipher security
                 var cipher_name = String(estimator.getEncryptionCipher()
-                      + "                 ").slice(0,16);
+                    + "                 ").slice(0,16);
                 var cipher_los = estimator.getCipherLoS();
                 clinker._clinkerPopupContentBulkCipher.textContent =
                     ("Bulk Cipher : ").concat(cipher_name).concat(" (")
                     .concat(cipher_los).concat(" bit)");
 
-                // save the integrity mechanism
-                if ( symetricCipher.contains("_GCM_SHA256") ) {
-                    estimator.setPseudoRandomFunction("SHA256");
-                    estimator.setIntegrityMechanism("AEAD",
-                        estimator.getCipherLoS());
-                } else if ( symetricCipher.contains("_GCM_SHA384") ) {
-                    estimator.setPseudoRandomFunction("SHA384");
-                    estimator.setIntegrityMechanism("AEAD",
-                        estimator.getCipherLoS());
-                } else if ( symetricCipher.contains("_SHA384") ) {
-                    estimator.setPseudoRandomFunction("SHA384");
-                    estimator.setIntegrityMechanism("SHA384 HMAC",
-                        estimator.getPseudoRandomFunctionLoS());
-                } else if ( symetricCipher.contains("_SHA256") ) {
-                    estimator.setPseudoRandomFunction("SHA256");
-                    estimator.setIntegrityMechanism("SHA256 HMAC",
-                        estimator.getPseudoRandomFunctionLoS());
-                } else if ( symetricCipher.contains("_MD5") ) {
-                    estimator.setPseudoRandomFunction("MD5");
-                    estimator.setIntegrityMechanism("MD5 HMAC",
-                        estimator.getPseudoRandomFunctionLoS());
-                } else if ( symetricCipher.contains("_SHA") ) {
-                    estimator.setPseudoRandomFunction("SHA1");
-                    estimator.setIntegrityMechanism("SHA1 HMAC",
-                        estimator.getPseudoRandomFunctionLoS());
-                }
+                // set the used integrity mechanism
+                var mechanismName = String(estimator.getIntegrityMechanismType()
+                    + "                 ").slice(0,17);
+                var mechanismLoS = ("(").concat(
+                    estimator.getIntegrityMechanismLoS()).concat(" bit)");
+                clinker._clinkerPopupContentMAC.textContent =
+                    ("Integrity   : ").concat(mechanismName)
+                    .concat(mechanismLoS);
             }
-            var mechanismName = String(estimator.getIntegrityMechanismType()
-                + "                 ").slice(0,17);
-            var mechanismLoS = ("(").concat(
-                estimator.getIntegrityMechanismLoS()).concat(" bit)");
-            clinker._clinkerPopupContentMAC.textContent =
-                ("Integrity   : ").concat(mechanismName).concat(mechanismLoS);
 
             // Is the connection secure?
             if (estimator.isRecommendedPractice() ) {
