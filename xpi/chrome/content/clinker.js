@@ -1383,7 +1383,10 @@ var clinker = {
                 } else {
                     clinker._clinkerPopupContentPfs.textContent =
                         ("\nPerfect Forward Secrecy [PFS]:  no");
-                    var kexName = String(estimator.getKeyExchange()
+                    var kexSize = String(estimator.getServerKeySize()
+                        + " bit ");
+                    var kexName = String(kexSize
+                        + estimator.getKeyExchange()
                         + "              ").slice(0,17);
                     clinker._clinkerPopupContentKeyExchange.textContent =
                         ("Key Exchange: "
@@ -1393,33 +1396,15 @@ var clinker = {
                          + " bit)");
                 }
 
-                // extract server key type
-                if ( symetricCipher.contains("_ECDSA_WITH_") ) {
-                    clinker._clinkerPopupContentSignature.textContent =
-                        ("Server key  : ECDSA            ("
-                         + estimator.getServerKeyLoS()
-                         + " bit)");
-                } else if ( symetricCipher.contains("_RSA_WITH_") ) {
-                    clinker._clinkerPopupContentSignature.textContent =
-                        ("Server key  : RSA              ("
-                         + estimator.getServerKeyLoS()
-                         + " bit)");
-                } else if ( symetricCipher.contains("_DSS_WITH_") ) {
-                    clinker._clinkerPopupContentSignature.textContent =
-                        ("Server key  : DSA              ("
-                         + estimator.getServerKeyLoS()
-                         + " bit)");
-                }
+                // set server key type
                 var keyType = String(estimator.getServerKeySize()
                     + " bit " + estimator.getServerKeyType()
                     + "                 ").slice(0,17);
-
                 clinker._clinkerPopupContentSignature.textContent =
                     "Server key  : " + keyType + "("
                     + estimator.getServerKeyLoS() + " bit)";
 
-
-                // set the detailed popup info for cipher security
+                // set bulk cipher info
                 var cipher_name = String(estimator.getEncryptionCipher()
                     + "                 ").slice(0,16);
                 var cipher_los = estimator.getCipherLoS();
