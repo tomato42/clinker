@@ -38,6 +38,9 @@ var clinkerCryptoEstimator = function() {
 clinkerCryptoEstimator.prototype.setKeyExchange = function(val) {
     this.kex = val;
 }
+clinkerCryptoEstimator.prototype.getKeyExchange = function() {
+    return this.kex
+}
 clinkerCryptoEstimator.prototype.setBulkCipher = function(val) {
     this.bulkCipher = val;
 }
@@ -855,30 +858,29 @@ var clinker = {
           // grade the key exchange
           if ( symetricCipher.contains("TLS_ECDHE_") ) {
               estimator.setKeyExchange("ECDHE");
-          clinker._clinkerPopupContentPfs.textContent         =  ("\nPerfect Forward Secrecy [PFS]:  YES  (20/20)");
-          clinker._clinkerPopupContentKeyExchange.textContent =  ("Key Exchange: ECDHE [PFS]      (25/25)");
           clinker_conn_score += 45;
           } else if ( symetricCipher.contains("TLS_DHE_") ) {
               estimator.setKeyExchange("DHE");
-          clinker._clinkerPopupContentPfs.textContent         =  ("\nPerfect Forward Secrecy [PFS]:  YES  (20/20)");
-          clinker._clinkerPopupContentKeyExchange.textContent =  ("Key Exchange: DHE [PFS]        (20/25)");
           clinker_conn_score += 40;
           } else if ( symetricCipher.contains("TLS_ECDH_") ) {
               estimator.setKeyExchange("ECDH");
-          clinker._clinkerPopupContentKeyExchange.textContent =  ("Key Exchange: ECDH             (10/25)");
           clinker_conn_score += 10;
           } else if ( symetricCipher.contains("TLS_DH_") ) {
               estimator.setKeyExchange("DH");
-          clinker._clinkerPopupContentKeyExchange.textContent =  ("Key Exchange: DH               ( 7/25)");
           clinker_conn_score += 7;
           } else if ( symetricCipher.contains("TLS_RSA_WITH_") ) {
               estimator.setKeyExchange("RSA");
-          clinker._clinkerPopupContentKeyExchange.textContent =  ("Key Exchange: RSA/server key   ( 3/25)");
           clinker_conn_score += 3;
           } else if ( symetricCipher.contains("SSL_RSA_WITH_") ) {
               estimator.setKeyExchange("RSA");
-          clinker._clinkerPopupContentKeyExchange.textContent =  ("Key Exchange: RSA/server key   ( 1/25)");
           clinker_conn_score += 1;
+          }
+          clinker._clinkerPopupContentKeyExchange.textContent = ("Key Exchange: ").concat(estimator.getKeyExchange());
+
+          if (estimator.isKeyExchangeForwardSecure) {
+              clinker._clinkerPopupContentPfs.textContent =  ("\nPerfect Forward Secrecy [PFS]:  yes");
+          } else {
+              clinker._clinkerPopupContentPfs.textContent =  ("\nPerfect Forward Secrecy [PFS]:  no");
           }
 
           // grade the signature
@@ -911,7 +913,7 @@ var clinker = {
               clinker_conn_score += 15;
           }
 
-          // set the detailed popup info
+          // set the detailed popup info for cipher security
           var cipher_name = String(estimator.getEncryptionCipher() + "                 ").slice(0,16);
           var cipher_los = estimator.getCipherLoS();
           clinker._clinkerPopupContentBulkCipher.textContent =
