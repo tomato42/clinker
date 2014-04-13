@@ -117,7 +117,7 @@ clinkerCryptoEstimator.prototype.addCertKey = function(type, size) {
     var keyLoS;
     if (type == "ECDSA") {
         //keyLoS = size / 2;
-        keyLoS = 112
+        keyLoS = 2; // TODO fix
     } else if (type == "RSA" || type == "DSA") {
        keyLoS = this.rsaLoSEstimator(size);
     }
@@ -132,6 +132,15 @@ clinkerCryptoEstimator.prototype.setServerKey = function(type, size) {
     this.serverKeyType = type;
     this.serverKeySize = size;
     this.addCertKey(type, size);
+}
+
+clinkerCryptoEstimator.prototype.getServerKeyLoS = function() {
+    if (this.serverKeyType == "ECDSA") {
+        return 2; // TODO fix
+    } else if (this.serverKeyType == "RSA" || this.serverKeyType == "DSA") {
+        return this.rsaLoSEstimator(this.serverKeySize);
+    }
+    return 0;
 }
 
 clinkerCryptoEstimator.prototype.setIntegrityMechanism = function(type, los) {
@@ -1096,10 +1105,10 @@ var clinker = {
             if (ui.state
                 & ci.nsIWebProgressListener.STATE_IDENTITY_EV_TOPLEVEL) {
                     clinker._clinkerPopupContentCertType.textContent =
-                        ("Class      : Extended Validation (EV)");
+                        ("Class           : Extended Validation (EV)");
             } else if (ui.state & ci.nsIWebProgressListener.STATE_IS_SECURE) {
                 clinker._clinkerPopupContentCertType.textContent =
-                    ("Class      : Domain Validation (DV)");
+                    ("Class           : Domain Validation (DV)");
             }
 
             // retrive the ssl cipher and key length
@@ -1311,27 +1320,42 @@ var clinker = {
                     estimator.setKeyExchange("RSA");
                     clinker_conn_score += 1;
                 }
-                clinker._clinkerPopupContentKeyExchange.textContent =
-                    ("Key Exchange: ").concat(estimator.getKeyExchange());
 
-                if (estimator.isKeyExchangeForwardSecure) {
+                if (estimator.isKeyExchangeForwardSecure()) {
                     clinker._clinkerPopupContentPfs.textContent =
                         ("\nPerfect Forward Secrecy [PFS]:  yes");
+                    clinker._clinkerPopupContentKeyExchange.textContent =
+                        (("Key Exchange: ").concat(estimator.getKeyExchange())
+                         + "            (? bit)");
                 } else {
                     clinker._clinkerPopupContentPfs.textContent =
                         ("\nPerfect Forward Secrecy [PFS]:  no");
+                    var kexName = String(estimator.getKeyExchange()
+                        + "              ").slice(0,17);
+                    clinker._clinkerPopupContentKeyExchange.textContent =
+                        ("Key Exchange: "
+                         + kexName
+                         + "("
+                         + estimator.getServerKeyLoS()
+                         + " bit)");
                 }
 
                 // extract server key type
                 if ( symetricCipher.contains("_ECDSA_WITH_") ) {
                     clinker._clinkerPopupContentSignature.textContent =
-                        ("Server key  : ECDSA");
+                        ("Server key  : ECDSA            ("
+                         + estimator.getServerKeyLoS()
+                         + " bit)");
                 } else if ( symetricCipher.contains("_RSA_WITH_") ) {
                     clinker._clinkerPopupContentSignature.textContent =
-                        ("Server key  : RSA");
+                        ("Server key  : RSA              ("
+                         + estimator.getServerKeyLoS()
+                         + " bit)");
                 } else if ( symetricCipher.contains("_DSS_WITH_") ) {
                     clinker._clinkerPopupContentSignature.textContent =
-                        ("Server key  : DSA");
+                        ("Server key  : DSA              ("
+                         + estimator.getServerKeyLoS()
+                         + " bit)");
                 }
 
                 // extract bulk cipher
@@ -1404,34 +1428,19 @@ var clinker = {
                 ("Integrity   : ").concat(mechanismName).concat(mechanismLoS);
 
             // Is the connection secure?
-            if (clinker_conn_score >= 90 ) {
-                clinker._clinkerPopupContentSecure.textContent =
-                    ("Security   : " + "Very Strong (green "
-                     + clinker_conn_score + "%)");
+            if (estimator.isRecommendedPractice() ) {
                 document.getElementById("clinker-urlicon")
                     .image="chrome://clinker/skin/clinker_green_button.png";
-            } else if (clinker_conn_score >= 80 && clinker_conn_score <= 89 ) {
-                clinker._clinkerPopupContentSecure.textContent =
-                    ("Security   : " + "Strong (blue "
-                     + clinker_conn_score + "%)");
-                document.getElementById("clinker-urlicon")
-                    .image="chrome://clinker/skin/clinker_blue_button.png";
-            } else if (clinker_conn_score >= 70 && clinker_conn_score <= 79 ) {
-                clinker._clinkerPopupContentSecure.textContent =
-                    ("Security   : " + "Moderate (yellow "
-                     + clinker_conn_score + "%)");
-                document.getElementById("clinker-urlicon")
-                    .image="chrome://clinker/skin/clinker_yellow_button.png";
-            // } else if (clinker_conn_score >= 50 && clinker_conn_score <= 69 ) {
-            //     clinker._clinkerPopupContentSecure.textContent =
-            //         ("Security   : " + "Weak (orange "
-            //          + clinker_conn_score + "%)");
-            //     document.getElementById("clinker-urlicon")
-            //         .image="chrome://clinker/skin/clinker_orange_button.png";
-            } else if (clinker_conn_score <= 69 ) {
-                clinker._clinkerPopupContentSecure.textContent =
-                    ("Security   : " + "WARNING! Very Weak (red "
-                     + clinker_conn_score + "%)");
+            } else if (estimator.isKeyExchangeForwardSecure()
+                && estimator.getEncryptionLoS() >= 128
+                && estimator.getAuthenticationLoS() >= 112 ) {
+                    document.getElementById("clinker-urlicon")
+                        .image="chrome://clinker/skin/clinker_blue_button.png";
+            } else if (estimator.getEncryptionLoS() >= 112
+                && estimator.getAuthenticationLoS() >= 112) {
+                    document.getElementById("clinker-urlicon")
+                        .image="chrome://clinker/skin/clinker_yellow_button.png";
+            } else {
                 document.getElementById("clinker-urlicon")
                     .image="chrome://clinker/skin/clinker_red_button.png";
             }
