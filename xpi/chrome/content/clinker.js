@@ -1355,25 +1355,14 @@ var clinker = {
                          + clinker_SubjectsCertificateLocationCountry);
                 }
 
-                // setup the default strings for the drop down menu cipher suite
-                // values
-                clinker._clinkerPopupContentCertificate.textContent =
-                    ("Certificate: " + clinker_ssl_cert_verification );
-                clinker._clinkerPopupContentCiphersuite.textContent =
-                    ("\nCiphersuite : " + symetricCipher );
-                clinker._clinkerPopupContentPfs.textContent =
-                    ("\nPerfect Forward Secrecy [PFS]:  NO  ( 0/20)");
-                clinker._clinkerPopupContentKeyExchange.textContent =
-                    ("Key Exchange: unknown");
-                clinker._clinkerPopupContentSignature.textContent =
-                    ("Signature   : unknown");
-                clinker._clinkerPopupContentBulkCipher.textContent =
-                    ("Bulk Cipher : unknown");
-                clinker._clinkerPopupContentMAC.textContent =
-                    ("MAC         : unknown");
-
+                // parse ciphersuite used by connection
                 estimator.setCipherSuite(symetricCipher);
 
+                // set used ciphersuite
+                clinker._clinkerPopupContentCiphersuite.textContent =
+                    ("\nCiphersuite : " + symetricCipher );
+
+                // set PFS status and key exchange algorithm
                 if (estimator.isKeyExchangeForwardSecure()) {
                     clinker._clinkerPopupContentPfs.textContent =
                         ("\nPerfect Forward Secrecy [PFS]:  yes");
@@ -1433,15 +1422,15 @@ var clinker = {
                         .image="chrome://clinker/skin/clinker_blue_button.png";
             } else if (estimator.getEncryptionLoS() >= 112
                 && estimator.getAuthenticationLoS() >= 112) {
-                    document.getElementById("clinker-urlicon")
-                        .image="chrome://clinker/skin/clinker_yellow_button.png";
+                    document.getElementById("clinker-urlicon").image=
+                        "chrome://clinker/skin/clinker_yellow_button.png";
             } else {
                 document.getElementById("clinker-urlicon")
                     .image="chrome://clinker/skin/clinker_red_button.png";
             }
 
             // provide information about long term confidentiality of
-            // connection (pasive MITM attack)
+            // connection
             var longTerm = estimator.getEncryptionLoS();
             var encryptionComment;
             if (longTerm < 80) {
@@ -1457,6 +1446,7 @@ var clinker = {
                 ("Confidentiality : ").concat(longTerm).concat(" bit ")
                 .concat(encryptionComment);
 
+            // provide information about authentication level
             var authenticationLoS = estimator.getAuthenticationLoS();
             var authenticationComment;
             if (authenticationLoS < 80) {
