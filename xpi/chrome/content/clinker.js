@@ -989,7 +989,6 @@ var clinker = {
         var insecureSSL = (ui.state
             & ci.nsIWebProgressListener.STATE_IS_INSECURE);
         var clinker_url_protocol = window.content.location.protocol;
-        var clinker_conn_score = 0;
         var clinker_prefTabTitle =
             prefs.getBoolPref("extensions.clinker.tab_title");
         var estimator = new clinkerCryptoEstimator();
@@ -1068,18 +1067,14 @@ var clinker = {
                     clinker_ssl_cert_verification = "Verified";
                 } else if (Ci.nsIWebProgressListener.STATE_IS_INSECURE) {
                     clinker_ssl_cert_verification = "WARNING! not trusted";
-                    clinker_conn_score -= 100;
                 } else {
                     clinker_ssl_cert_verification = "WARNING! broken";
-                    clinker_conn_score -= 100;
                 }
 
                 // does the url hostname and certificate common name match?
                 var clinker_hosts_match = " (DOMAIN MISMATCH!)";
-                    clinker_conn_score -= 100;
                 if (! clinker_ssl_cert.isDomainMismatch) {
                     clinker_hosts_match = " (matched)";
-                    clinker_conn_score += 100;
                 }
 
                 // print out the certificate info
@@ -1204,7 +1199,6 @@ var clinker = {
                             .contains("SHA-512"))
                         ) {
                             clinker_SubjectPublicKeyStrength = " (10/10)";
-                            clinker_conn_score += 10;
                             estimator.setSigHash("SHA256");
                     } else if (clinker_SubjectPublicKeyAlgorithm.indexOf("SHA")
                         && parseInt(clinker_SubjectsPublicKey) > 2047
@@ -1213,19 +1207,16 @@ var clinker = {
                             .contains("SHA-512"))
                         ) {
                             clinker_SubjectPublicKeyStrength = " (10/10)";
-                            clinker_conn_score += 10;
                             estimator.setSigHash("SHA256");
                     } else if (clinker_SubjectPublicKeyAlgorithm.indexOf("SHA")
                         && clinker_SubjectsPublicKey == "Curve"
                         && clinker_SubjectPublicKeyAlgorithm.contains("SHA-1") ) {
                             clinker_SubjectPublicKeyStrength = " (4/10)";
-                            clinker_conn_score += 4;
                             estimator.setSigHash("SHA1");
                     } else if (clinker_SubjectPublicKeyAlgorithm.indexOf("SHA")
                         && parseInt(clinker_SubjectsPublicKey) > 2047
                         && clinker_SubjectPublicKeyAlgorithm.contains("SHA-1")) {
                             clinker_SubjectPublicKeyStrength = " (4/10)";
-                            clinker_conn_score += 4;
                             estimator.setSigHash("SHA1");
                     } else {
                         clinker_SubjectPublicKeyStrength = " (0/10)";
@@ -1241,7 +1232,6 @@ var clinker = {
                             .contains("SHA-512"))
                         ) {
                             clinker_CertificateSignatureStrength = " (10/10)";
-                            clinker_conn_score += 10;
                     } else if (clinker_CertificateSignatureAlgrithm.indexOf("SHA")
                         && parseInt(clinker_CertificateSignatureValue[4]) > 2047
                         && (clinker_CertificateSignatureAlgrithm.contains("SHA-256")
@@ -1249,17 +1239,14 @@ var clinker = {
                             .contains("SHA-512"))
                         ) {
                             clinker_CertificateSignatureStrength = " (10/10)";
-                            clinker_conn_score += 10;
                     } else if (clinker_CertificateSignatureAlgrithm.indexOf("SHA")
                         && clinker_CertificateSignatureValue[4] == "Curve"
                         && clinker_CertificateSignatureAlgrithm.contains("SHA-1")) {
                             clinker_CertificateSignatureStrength = " (4/10)";
-                            clinker_conn_score += 4;
                     } else if (clinker_CertificateSignatureAlgrithm.indexOf("SHA")
                         && parseInt(clinker_CertificateSignatureValue[4]) > 2047
                         && clinker_CertificateSignatureAlgrithm.contains("SHA-1")) {
                             clinker_CertificateSignatureStrength = " (4/10)";
-                            clinker_conn_score += 4;
                     } else {
                         clinker_CertificateSignatureStrength = " (0/10)";
                     }
@@ -1303,22 +1290,16 @@ var clinker = {
                 // grade the key exchange
                 if ( symetricCipher.contains("TLS_ECDHE_") ) {
                     estimator.setKeyExchange("ECDHE");
-                    clinker_conn_score += 45;
                 } else if ( symetricCipher.contains("TLS_DHE_") ) {
                     estimator.setKeyExchange("DHE");
-                    clinker_conn_score += 40;
                 } else if ( symetricCipher.contains("TLS_ECDH_") ) {
                     estimator.setKeyExchange("ECDH");
-                    clinker_conn_score += 10;
                 } else if ( symetricCipher.contains("TLS_DH_") ) {
                     estimator.setKeyExchange("DH");
-                    clinker_conn_score += 7;
                 } else if ( symetricCipher.contains("TLS_RSA_WITH_") ) {
                     estimator.setKeyExchange("RSA");
-                    clinker_conn_score += 3;
                 } else if ( symetricCipher.contains("SSL_RSA_WITH_") ) {
                     estimator.setKeyExchange("RSA");
-                    clinker_conn_score += 1;
                 }
 
                 if (estimator.isKeyExchangeForwardSecure()) {
@@ -1361,22 +1342,16 @@ var clinker = {
                 // extract bulk cipher
                 if ( symetricCipher.contains("_AES_256_") ) {
                     estimator.setBulkCipher("AES-256");
-                    clinker_conn_score += 15;
                 } else if ( symetricCipher.contains("_AES_128_") ) {
                     estimator.setBulkCipher("AES-128");
-                    clinker_conn_score += 15;
                 } else if ( symetricCipher.contains("_RC4_128_") ) {
                     estimator.setBulkCipher("RC4");
-                clinker_conn_score += 4;
                 } else if ( symetricCipher.contains("_3DES_") ) {
                     estimator.setBulkCipher("3DES");
-                clinker_conn_score += 4;
                 } else if ( symetricCipher.contains("_CAMELLIA_256_") ) {
                     estimator.setBulkCipher("CAMELLIA-256");
-                clinker_conn_score += 15;
                 } else if ( symetricCipher.contains("_CAMELLIA_128_") ) {
                     estimator.setBulkCipher("CAMELLIA-128");
-                    clinker_conn_score += 15;
                 }
 
                 // set the detailed popup info for cipher security
@@ -1392,32 +1367,26 @@ var clinker = {
                     estimator.setPseudoRandomFunction("SHA256");
                     estimator.setIntegrityMechanism("AEAD",
                         estimator.getCipherLoS());
-                    clinker_conn_score += 20;
                 } else if ( symetricCipher.contains("_GCM_SHA384") ) {
                     estimator.setPseudoRandomFunction("SHA384");
                     estimator.setIntegrityMechanism("AEAD",
                         estimator.getCipherLoS());
-                    clinker_conn_score += 20;
                 } else if ( symetricCipher.contains("_SHA384") ) {
                     estimator.setPseudoRandomFunction("SHA384");
                     estimator.setIntegrityMechanism("SHA384 HMAC",
                         estimator.getPseudoRandomFunctionLoS());
-                    clinker_conn_score += 10;
                 } else if ( symetricCipher.contains("_SHA256") ) {
                     estimator.setPseudoRandomFunction("SHA256");
                     estimator.setIntegrityMechanism("SHA256 HMAC",
                         estimator.getPseudoRandomFunctionLoS());
-                    clinker_conn_score += 10;
                 } else if ( symetricCipher.contains("_MD5") ) {
                     estimator.setPseudoRandomFunction("MD5");
                     estimator.setIntegrityMechanism("MD5 HMAC",
                         estimator.getPseudoRandomFunctionLoS());
-                    clinker_conn_score += 1;
                 } else if ( symetricCipher.contains("_SHA") ) {
                     estimator.setPseudoRandomFunction("SHA1");
                     estimator.setIntegrityMechanism("SHA1 HMAC",
                         estimator.getPseudoRandomFunctionLoS());
-                    clinker_conn_score += 8;
                 }
             }
             var mechanismName = String(estimator.getIntegrityMechanismType()
@@ -1480,10 +1449,8 @@ var clinker = {
             // if the ssl connection is just plain broke
             if (ui.state & ci.nsIWebProgressListener.STATE_IS_INSECURE
                 || ui.state & ci.nsIWebProgressListener.STATE_IS_BROKEN) {
-                    clinker_conn_score = 0;
                     clinker._clinkerPopupContentSecure.textContent =
-                        ("Security   : " + "WARNING! BROKEN or UNTRUSTED (red "
-                         + clinker_conn_score + "%)");
+                        ("Security   : " + "WARNING! BROKEN or UNTRUSTED");
                     document.getElementById("clinker-urlicon").image=
                         "chrome://clinker/skin/clinker_redbroke_button.png";
             }
