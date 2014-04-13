@@ -35,6 +35,21 @@ var clinkerCryptoEstimator = function() {
     // weakest algorithm type used in certificates (MD5, SHA-1, SHA-256, etc.)
     this.lowestSignatureLoS = null;
 }
+clinkerCryptoEstimator.prototype.setPseudoRandomFunction = function(val) {
+    this.prf = val;
+}
+clinkerCryptoEstimator.prototype.getPseudoRandomFunctionLoS = function() {
+    if (this.prf == "MD5") {
+        return 128;
+    } else if (this.prf == "SHA1") {
+        return 160;
+    } else if (this.prf == "SHA256") {
+        return 256;
+    } else if (this.prf == "SHA384") {
+        return 384;
+    }
+    return 0;
+}
 clinkerCryptoEstimator.prototype.setKeyExchange = function(val) {
     this.kex = val;
 }
@@ -111,6 +126,12 @@ clinkerCryptoEstimator.prototype.setServerKey = function(type, size) {
 clinkerCryptoEstimator.prototype.setIntegrityMechanism = function(type, los) {
     this.integrity = type;
     this.integrityLoS = los;
+}
+clinkerCryptoEstimator.prototype.getIntegrityMechanismType = function() {
+    return this.integrity;
+}
+clinkerCryptoEstimator.prototype.getIntegrityMechanismLoS = function() {
+    return this.integrityLoS;
 }
 // return estimated level of security for used bulk cipher
 clinkerCryptoEstimator.prototype.getCipherLoS = function() {
@@ -883,16 +904,16 @@ var clinker = {
               clinker._clinkerPopupContentPfs.textContent =  ("\nPerfect Forward Secrecy [PFS]:  no");
           }
 
-          // grade the signature
+          // extract server key type
           if ( symetricCipher.contains("_ECDSA_WITH_") ) {
-              clinker._clinkerPopupContentSignature.textContent   =  ("Signature   : ECDSA");
+              clinker._clinkerPopupContentSignature.textContent   =  ("Server key  : ECDSA");
           } else if ( symetricCipher.contains("_RSA_WITH_") ) {
-              clinker._clinkerPopupContentSignature.textContent   =  ("Signature   : RSA");
+              clinker._clinkerPopupContentSignature.textContent   =  ("Server key  : RSA");
           } else if ( symetricCipher.contains("_DSS_WITH_") ) {
-              clinker._clinkerPopupContentSignature.textContent   =  ("Signature   : DSA");
+              clinker._clinkerPopupContentSignature.textContent   =  ("Server key  : DSA");
           }
  
-          // grade the bulk cipher and bit length
+          // extract bulk cipher
           if ( symetricCipher.contains("_AES_256_") ) {
               estimator.setBulkCipher("AES-256");
               clinker_conn_score += 15;
@@ -921,25 +942,33 @@ var clinker = {
 
           // save the integrity mechanism
           if ( symetricCipher.contains("_GCM_SHA256") ) {
-          clinker._clinkerPopupContentMAC.textContent         =  ("MAC         : SHA-256 AEAD GCM (20/20)");
+              estimator.setPseudoRandomFunction("SHA256");
+              estimator.setIntegrityMechanism("AEAD", estimator.getCipherLoS());
           clinker_conn_score += 20;
           } else if ( symetricCipher.contains("_GCM_SHA384") ) {
-          clinker._clinkerPopupContentMAC.textContent         =  ("MAC         : SHA-384 AEAD GCM (20/20)");
+              estimator.setPseudoRandomFunction("SHA384");
+              estimator.setIntegrityMechanism("AEAD", estimator.getCipherLoS());
           clinker_conn_score += 20;
           } else if ( symetricCipher.contains("_SHA384") ) {
-          clinker._clinkerPopupContentMAC.textContent         =  ("MAC         : SHA-384          (10/20)");
+              estimator.setPseudoRandomFunction("SHA384");
+              estimator.setIntegrityMechanism("SHA384 HMAC", estimator.getPseudoRandomFunctionLoS());
           clinker_conn_score += 10;
           } else if ( symetricCipher.contains("_SHA256") ) {
-          clinker._clinkerPopupContentMAC.textContent         =  ("MAC         : SHA-256          (10/20)");
+              estimator.setPseudoRandomFunction("SHA256");
+              estimator.setIntegrityMechanism("SHA256 HMAC", estimator.getPseudoRandomFunctionLoS());
           clinker_conn_score += 10;
           } else if ( symetricCipher.contains("_MD5") ) {
-          clinker._clinkerPopupContentMAC.textContent         =  ("MAC         : MD5              ( 1/20)");
+              estimator.setPseudoRandomFunction("MD5");
+              estimator.setIntegrityMechanism("MD5 HMAC", estimator.getPseudoRandomFunctionLoS());
           clinker_conn_score += 1;
           } else if ( symetricCipher.contains("_SHA") ) {
-          clinker._clinkerPopupContentMAC.textContent         =  ("MAC         : SHA-1            ( 8/20)");
+              estimator.setPseudoRandomFunction("SHA1");
+              estimator.setIntegrityMechanism("SHA1 HMAC", estimator.getPseudoRandomFunctionLoS());
           clinker_conn_score += 8; }
-
-       }
+          }
+       var mechanismName = String(estimator.getIntegrityMechanismType() + "                 ").slice(0,17);
+       var mechanismLoS = ("(").concat(estimator.getIntegrityMechanismLoS()).concat(" bit)");
+       clinker._clinkerPopupContentMAC.textContent = ("Integrity   : ").concat(mechanismName).concat(mechanismLoS);
 
        // Is the connection secure? 
        if (clinker_conn_score >= 90 ) {
@@ -970,7 +999,7 @@ var clinker = {
        } else if (longTerm < 128) {
            encryptionComment = "(secure until around 20XX)";
        } else {
-           encryptionComment = "(secure for forseeable future)";
+           encryptionComment = "(secure for foreseeable future)";
        }
        clinker._clinkerPopupContentSecure.textContent = ("Confidentiality : ").concat(longTerm).concat(" bit ").concat(encryptionComment);
 
@@ -984,9 +1013,9 @@ var clinker = {
        } else if (authenticationLoS < 128) {
            authenticationComment = "(secure up to around 20XX)";
        } else {
-           authenticationComment = "(secure for forseeable future)";
+           authenticationComment = "(secure for foreseeable future)";
        }
-       clinker._clinkerPopupContentCertificate.textContent = ("Authentication : ").concat(authenticationLoS).concat(" bit ").concat(authenticationComment);
+       clinker._clinkerPopupContentCertificate.textContent = ("Authentication  : ").concat(authenticationLoS).concat(" bit ").concat(authenticationComment);
 
        // if the ssl connection is just plain broke
        if (ui.state & ci.nsIWebProgressListener.STATE_IS_INSECURE || ui.state & ci.nsIWebProgressListener.STATE_IS_BROKEN) {
