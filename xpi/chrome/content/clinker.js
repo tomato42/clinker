@@ -1380,7 +1380,6 @@ var clinker = {
                     var certificatesAll = cc["@mozilla.org/security/nsASN1Tree;1"]
                         .createInstance(ci.nsIASN1Tree);
                     certificatesAll.loadASN1Structure(serverCert.ASN1Structure);
-                    var clinker_CertificateSignatureStrength = "";
                     var clinker_SubjectPublicKeyAlgorithm =
                         certificatesAll.getDisplayData(4).replace(/PKCS #1/g,'')
                         .replace(/Encryption/g,'@');
@@ -1479,24 +1478,18 @@ var clinker = {
                             || clinker_CertificateSignatureAlgrithm
                             .contains("SHA-512"))
                         ) {
-                            clinker_CertificateSignatureStrength = " (10/10)";
                     } else if (clinker_CertificateSignatureAlgrithm.indexOf("SHA")
                         && parseInt(clinker_CertificateSignatureValue[4]) > 2047
                         && (clinker_CertificateSignatureAlgrithm.contains("SHA-256")
                             || clinker_CertificateSignatureAlgrithm
                             .contains("SHA-512"))
                         ) {
-                            clinker_CertificateSignatureStrength = " (10/10)";
                     } else if (clinker_CertificateSignatureAlgrithm.indexOf("SHA")
                         && clinker_CertificateSignatureValue[4] == "Curve"
                         && clinker_CertificateSignatureAlgrithm.contains("SHA-1")) {
-                            clinker_CertificateSignatureStrength = " (4/10)";
                     } else if (clinker_CertificateSignatureAlgrithm.indexOf("SHA")
                         && parseInt(clinker_CertificateSignatureValue[4]) > 2047
                         && clinker_CertificateSignatureAlgrithm.contains("SHA-1")) {
-                            clinker_CertificateSignatureStrength = " (4/10)";
-                    } else {
-                        clinker_CertificateSignatureStrength = " (0/10)";
                     }
 
                 }
