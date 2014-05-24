@@ -368,13 +368,13 @@ clinkerCryptoEstimator.prototype.getEncryptionLoS = function() {
     if (minLoS == null || minLoS > cipherLoS) {
         minLoS = cipherLoS;
     }
-/*
+
     if (this.integrity != "AEAD") {
         if (minLoS > this.integrityLoS) {
             minLoS = this.integrityLoS;
         }
     }
-*/
+
     return minLoS;
 }
 
