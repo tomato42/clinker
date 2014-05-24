@@ -13,9 +13,6 @@
 var clinkerCryptoEstimator = function() {
     // key exchange algorithm used in TLS
     this.kex = null;
-    // server certificate authentication mechanism (how identity of server is
-    // certified)
-    this.authentication = null;
     // bulk cipher used to provide secrecy
     this.bulkCipher = "Unknown";
     // mechanism used to provide integrity of transmitted data
