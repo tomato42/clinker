@@ -25,15 +25,13 @@ var clinkerCryptoEstimator = function() {
     this.serverKeyType = null;
     // length of public key used by server
     this.serverKeySize = null;
-    // in case of ECDSA: name of curve used
-    this.serverCurveName = null;
     // information about key size in certificate
     this.certChainSize = [];
     // information about the type/algorithm (RSA, ECDSA, DSA)
     this.certChainAlg = [];
     // information about the hash used for signing (SHA1, SHA224, etc.)
     this.certChainHash = [];
-    // stats for printing the certificates in label
+    // cert stats for easy printing
     this.certChainLabels = [];
 }
 
