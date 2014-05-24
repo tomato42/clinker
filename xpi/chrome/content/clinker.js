@@ -1385,8 +1385,10 @@ var clinker = {
                     clinker._clinkerPopupContentPfs.textContent =
                         ("\nPerfect Forward Secrecy [PFS]:  yes");
                     clinker._clinkerPopupContentKeyExchange.textContent =
-                        (("Key Exchange: ").concat(estimator.getKeyExchange())
-                         + "            (? bit)");
+                        String("Key Exchange: " +
+                                estimator.getKeyExchange() +
+                                "                      ").slice(0,31)
+                        + "(? bit)";
                 } else {
                     clinker._clinkerPopupContentPfs.textContent =
                         ("\nPerfect Forward Secrecy [PFS]:  no");
