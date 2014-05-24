@@ -34,12 +34,12 @@ var clinkerCryptoEstimator = function() {
     this.lowestCertKeyLoS = null;
     // weakest algorithm type used in certificates (MD5, SHA-1, SHA-256, etc.)
     this.lowestSignatureLoS = null;
-    // information about signature hash in certificates
-    this.certChainSigAlg = null;
     // information about key size in certificate
     this.certChainSize = [];
     // information about the type/algorithm (RSA, ECDSA, DSA)
     this.certChainAlg = [];
+    // information about the hash used for signing (SHA1, SHA224, etc.)
+    this.certChainHash = [];
     // stats for printing the certificates in label
     this.certChainLabels = [];
 }
@@ -60,11 +60,11 @@ clinkerCryptoEstimator.prototype.setServerCertificate = function(clinker_cert) {
         var certCn  = cert.commonName  ?cert.commonName  :cert.organization;
 
         var certAlg = null;
-        if (cert_dump.getDisplayData(11).indexOf("RSA")) {
+        if (cert_dump.getDisplayData(11).indexOf("RSA") >= 0) {
             certAlg = "RSA";
         }
         if (!certAlg) {
-            if (cert_dump.certDmp.getDisplayData(12).indexOf("EC")) {
+            if (cert_dump.getDisplayData(12).indexOf("Elliptic") >= 0) {
                 certAlg = "ECDSA";
             } else {
                 certAlg = "DSA";
@@ -92,23 +92,91 @@ clinkerCryptoEstimator.prototype.setServerCertificate = function(clinker_cert) {
                     keySize = (8 * keySize.length);
                     break;
                 case 'ECDSA':
-                    //keySize = cert_dump.getDisplayData(14).split('\n')[0];
-                    //keySize = cert_dump.getDisplayData(14);
-                    keySize = "4242424242";
+                    keySize = cert_dump.getDisplayData(14).split(' ')[2];
                     break;
             }
             //return keySize;
         } catch (e) {}
 
+        var certHash = null;
+        try {
+            var tmp = cert_dump.getDisplayData(4);
+            if (tmp.indexOf("SHA-1") >= 0) {
+                certHash = "SHA1";
+            } else if (tmp.indexOf("SHA-224") >= 0) {
+                certHash = "SHA224";
+            } else if (tmp.indexOf("SHA-256") >= 0) {
+                certHash = "SHA256";
+                // ECDSA signatures are not translated by FF
+            } else if (tmp.indexOf("1 2 840 10045 4 1") >= 0) {
+                certHash = "SHA1";
+            } else if (tmp.indexOf("1 2 840 10045 4 3 1") >= 0) {
+                certHash = "SHA224";
+            } else if (tmp.indexOf("1 2 840 10045 4 3 2") >= 0) {
+                certHash = "SHA256";
+            } else if (tmp.indexOf("1 2 840 10045 4 3 3") >= 0) {
+                certHash = "SHA384";
+            } else if (tmp.indexOf("1 2 840 10045 4 3 4") >= 0) {
+                certHash = "SHA512";
+            } else {
+                certHash = tmp;
+            }
+        } catch (e) {}
+
 
         this.certChainSize[count] = keySize;
         this.certChainAlg[count] = certAlg;
+        this.certChainHash[count] = certHash;
 
         if (count == 0) {
-            this.setServerKey("run", keySize);
+            this.setServerKey(certAlg, keySize);
+        }
+
+        var certLoS = null;
+        if (cert_chain.hasMoreElements()) {
+            certLoS = this.getCertLoS(certAlg, keySize, certHash);
+            this.certChainLabels[count] = certOrg + " [" + keySize + " bit " +
+                certAlg + ", " + certHash + "] (" + certLoS + " bit)";
+
+        } else {
+            // last certificate must be in cert store, that means its
+            // hash is as secure as the cert store, so we can assume sha512
+            certLoS = this.getCertLoS(certAlg, keySize, "SHA512");
+            this.certChainLabels[count] = certOrg + " [" + keySize + " bit " +
+                certAlg + "] (" + certLoS + " bit)";
         }
 
         count=count+1;
+    }
+}
+
+clinkerCryptoEstimator.prototype.getChainLabel = function() {
+    var label = "";
+    var i = this.certChainLabels.length - 1;
+
+    while (i >= 0) {
+        label = label + "\n" + this.certChainLabels[i];
+        i -= 1;
+    }
+
+    return label;
+}
+
+clinkerCryptoEstimator.prototype.getCertLoS = function(alg, size, hash) {
+    var los = null;
+
+    if (alg == "ECDSA") {
+        los = size / 2;
+    } else {
+        los = this.rsaLoSEstimator(size);
+    }
+
+    var hashLoS = this.hashSecurityEstimator(hash);
+
+    if (hashLoS < los) {
+        return hashLoS;
+    } else {
+        return los;
     }
 }
 
@@ -121,10 +189,14 @@ clinkerCryptoEstimator.prototype.getPseudoRandomFunctionLoS = function() {
         return 128;
     } else if (this.prf == "SHA1") {
         return 160;
+    } else if (this.prf == "SHA224") {
+        return 224;
     } else if (this.prf == "SHA256") {
         return 256;
     } else if (this.prf == "SHA384") {
         return 384;
+    } else if (this.prf == "SHA512") {
+        return 512;
     }
     return 0;
 }
@@ -146,8 +218,12 @@ clinkerCryptoEstimator.prototype.hashSecurityEstimator = function(val) {
         return 64;
     } else if (val == "SHA1") {
         return 80;
+    } else if (val == "SHA224") {
+        return 112;
     } else if (val == "SHA256") {
         return 128;
+    } else if (val == "SHA384") {
+        return 192;
     } else if (val == "SHA512") {
         return 256;
     } else {
@@ -194,8 +270,7 @@ clinkerCryptoEstimator.prototype.rsaLoSEstimator = function(val) {
 clinkerCryptoEstimator.prototype.addCertKey = function(type, size) {
     var keyLoS;
     if (type == "ECDSA") {
-        //keyLoS = size / 2;
-        keyLoS = size; // TODO fix
+        keyLoS = size / 2;
     } else if (type == "RSA" || type == "DSA") {
        keyLoS = this.rsaLoSEstimator(size);
     }
@@ -214,8 +289,7 @@ clinkerCryptoEstimator.prototype.setServerKey = function(type, size) {
 
 clinkerCryptoEstimator.prototype.getServerKeyLoS = function() {
     if (this.serverKeyType == "ECDSA") {
-        //return this.serverKeySize;
-        return 12; // TODO fix
+        return this.serverKeySize / 2;
     } else if (this.serverKeyType == "RSA" || this.serverKeyType == "DSA") {
         return this.rsaLoSEstimator(this.serverKeySize);
     }
@@ -264,7 +338,7 @@ clinkerCryptoEstimator.prototype.getCipherLoS = function() {
         return 112;
     } else if ( this.bulkCipher == "RC4" ) {
         // because of biases in output, the security is reduced from 128 bits
-        return 32;
+        return 56;
     }
     return 0;
 }
@@ -316,10 +390,37 @@ clinkerCryptoEstimator.prototype.isKeyExchangeForwardSecure = function() {
 clinkerCryptoEstimator.prototype.getAuthenticationLoS = function() {
     var los = null;
 
-    los = this.lowestSignatureLoS;
+    // the position in cert chain (starts with server cert)
+    var count = 0;
+    var lastCert = this.certChainAlg.length - 1;
 
-    if (los == null || los > this.lowestCertKeyLoS) {
-        los = this.lowestCertKeyLoS;
+    if (this.certChainAlg[count] == "ECDSA") {
+        los = this.certChainSize[count] / 2;
+    } else {
+        los = this.rsaLoSEstimator(this.certChainSize[count]);
+    }
+
+    while (count < this.certChainAlg.length) {
+        var keyLoS = null;
+        if (this.certChainAlg[count] == "ECDSA") {
+            keyLoS = this.certChainSize[count] / 2;
+        } else {
+            keyLoS = this.rsaLoSEstimator(this.certChainSize[count]);
+        }
+
+        if (keyLoS < los) {
+            los = keyLoS;
+        }
+
+        if (count != lastCert) {
+            var hashLoS = null;
+            hashLoS = this.hashSecurityEstimator(this.certChainHash[count]);
+            if (hashLoS < los) {
+                los = hashLoS;
+            }
+        }
+
+        count += 1;
     }
 
     return los;
@@ -1240,10 +1341,8 @@ var clinker = {
                 clinker._clinkerPopupContentCommonName.textContent =
                     ("Common Name (CN): " + clinker_ssl_cert.commonName
                      + clinker_hosts_match);
-                clinker._clinkerPopupContentOrganization.textContent =
-                    ("\nIssued to  : " + clinker_ssl_cert.organization);
-                clinker._clinkerPopupContentIssuerOrganization.textContent =
-                    ("Issued by  : " + clinker_ssl_cert.issuerOrganization);
+                var label = estimator.getChainLabel();
+                clinker._clinkerPopupContentOrganization.textContent = label;
                 clinker._clinkerPopupContentValidBeforeDate.textContent =
                     ("Valid from : "
                      + clinker_date_validity.notBeforeLocalTime);
@@ -1409,23 +1508,6 @@ var clinker = {
                         clinker_CertificateSignatureStrength = " (0/10)";
                     }
 
-                    // print the info
-                    clinker._clinkerPopupContentOrganizationSubCert.textContent =
-                        ("           :" + clinker_SubjectPublicKeyAlgorithm + " "
-                         + clinker_SubjectsPublicKey + " bit"
-                         + clinker_SubjectPublicKeyStrength);
-                    clinker._clinkerPopupContentOrganizationCaCert.textContent =
-                        ("           :" + clinker_CertificateSignatureAlgrithm + " "
-                         + clinker_CertificateSignatureValue[4] + " bit"
-                         + clinker_CertificateSignatureStrength);
-                    clinker._clinkerPopupContentOrganizationLocation.textContent =
-                        ("           :" + clinker_SubjectsPublicKeyLocationCity
-                         + clinker_SubjectsPublicKeyLocationState
-                         + clinker_SubjectsPublicKeyLocationCountry);
-                    clinker._clinkerPopupContentIssuerLocation.textContent =
-                        ("           :" + clinker_SubjectsCertificateLocationCity
-                         + clinker_SubjectsCertificateLocationState
-                         + clinker_SubjectsCertificateLocationCountry);
                 }
 
                 // parse ciphersuite used by connection
