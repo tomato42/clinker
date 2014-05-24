@@ -34,6 +34,82 @@ var clinkerCryptoEstimator = function() {
     this.lowestCertKeyLoS = null;
     // weakest algorithm type used in certificates (MD5, SHA-1, SHA-256, etc.)
     this.lowestSignatureLoS = null;
+    // information about signature hash in certificates
+    this.certChainSigAlg = null;
+    // information about key size in certificate
+    this.certChainSize = [];
+    // information about the type/algorithm (RSA, ECDSA, DSA)
+    this.certChainAlg = [];
+    // stats for printing the certificates in label
+    this.certChainLabels = [];
+}
+
+clinkerCryptoEstimator.prototype.setServerCertificate = function(clinker_cert) {
+    var cert_chain = clinker_cert.getChain().enumerate();
+
+    count=0
+    while (cert_chain.hasMoreElements()) {
+        var cert = cert_chain.getNext().QueryInterface(Ci.nsIX509Cert2);
+
+        var cert_dump =
+            Cc['@mozilla.org/security/nsASN1Tree;1']
+            .createInstance(Ci.nsIASN1Tree);
+        cert_dump.loadASN1Structure(cert.ASN1Structure);
+
+        var certOrg = cert.organization?cert.organization:cert.commonName;
+        var certCn  = cert.commonName  ?cert.commonName  :cert.organization;
+
+        var certAlg = null;
+        if (cert_dump.getDisplayData(11).indexOf("RSA")) {
+            certAlg = "RSA";
+        }
+        if (!certAlg) {
+            if (cert_dump.certDmp.getDisplayData(12).indexOf("EC")) {
+                certAlg = "ECDSA";
+            } else {
+                certAlg = "DSA";
+            }
+        }
+
+        var keySize = null;
+        try {
+            switch (certAlg) {
+                case 'RSA':
+                    keySize = cert_dump.getDisplayData(12).split('\n')[0];
+                    keySize = keySize.split(' ')[1];
+                    keySize = keySize.split('(')[1];
+                    break;
+                case 'DSA':
+                    keySize = cert_dump.getDisplayData(14);
+                    keySize = keySize.replace(key.split('\n')[0], '');
+                    keySize = keySize.replace(/\n|(\s$)/g, '').split(/\s/);
+                    if (keySize[0] === '02' && keySize[1] === '81') {
+                        keySize.splice(0,3);
+                    }
+                    if (keySize[0] === '00') {
+                        keySize.splice(0,1);
+                    }
+                    keySize = (8 * keySize.length);
+                    break;
+                case 'ECDSA':
+                    //keySize = cert_dump.getDisplayData(14).split('\n')[0];
+                    //keySize = cert_dump.getDisplayData(14);
+                    keySize = "4242424242";
+                    break;
+            }
+            //return keySize;
+        } catch (e) {}
+
+
+        this.certChainSize[count] = keySize;
+        this.certChainAlg[count] = certAlg;
+
+        if (count == 0) {
+            this.setServerKey("run", keySize);
+        }
+
+        count=count+1;
+    }
 }
 
 clinkerCryptoEstimator.prototype.setPseudoRandomFunction = function(val) {
@@ -103,8 +179,10 @@ clinkerCryptoEstimator.prototype.rsaLoSEstimator = function(val) {
         keyLoS = 80;
     } else if (val < 3068) { // 3072 == 128 bit
         keyLoS = 112;
-    } else if (val < 7660) { // 7680 == 192 bit
+    } else if (val < 4094) { // 4096 == 152 bit
         keyLoS = 128;
+    } else if (val < 7660) { // 7680 == 192 bit
+        keyLoS = 152;
     } else if (val < 15300) { // 15360 == 256 bit
         keyLoS = 192;
     } else {
@@ -117,7 +195,7 @@ clinkerCryptoEstimator.prototype.addCertKey = function(type, size) {
     var keyLoS;
     if (type == "ECDSA") {
         //keyLoS = size / 2;
-        keyLoS = 2; // TODO fix
+        keyLoS = size; // TODO fix
     } else if (type == "RSA" || type == "DSA") {
        keyLoS = this.rsaLoSEstimator(size);
     }
@@ -136,7 +214,8 @@ clinkerCryptoEstimator.prototype.setServerKey = function(type, size) {
 
 clinkerCryptoEstimator.prototype.getServerKeyLoS = function() {
     if (this.serverKeyType == "ECDSA") {
-        return 2; // TODO fix
+        //return this.serverKeySize;
+        return 12; // TODO fix
     } else if (this.serverKeyType == "RSA" || this.serverKeyType == "DSA") {
         return this.rsaLoSEstimator(this.serverKeySize);
     }
@@ -1139,6 +1218,9 @@ var clinker = {
                 if (!status) return;
                 var clinker_ssl_cert = status.serverCert;
                 if (!(clinker_ssl_cert)) return;
+
+                count = estimator.setServerCertificate(clinker_ssl_cert);
+
                 var clinker_date_validity =
                     clinker_ssl_cert.validity
                     .QueryInterface(ci.nsIX509CertValidity);
@@ -1149,7 +1231,7 @@ var clinker = {
                 // does the url hostname and certificate common name match?
                 var clinker_hosts_match = " (DOMAIN MISMATCH!)";
                 if (! clinker_ssl_cert.isDomainMismatch) {
-                    clinker_hosts_match = " (matched)";
+                    clinker_hosts_match = " (matched) " + count;
                 }
 
                 // print out the certificate info
@@ -1297,8 +1379,8 @@ var clinker = {
                     } else {
                         clinker_SubjectPublicKeyStrength = " (0/10)";
                     }
-                    estimator.setServerKey("RSA",
-                        parseInt(clinker_SubjectsPublicKey));
+                    //estimator.setServerKey("RSA",
+                    //    parseInt(clinker_SubjectsPublicKey));
 
                     // grade the stength of the certificate authorities hashes
                     if (clinker_CertificateSignatureAlgrithm.indexOf("SHA")
@@ -1429,9 +1511,11 @@ var clinker = {
             } else if (longTerm < 112) {
                 encryptionComment = "(insecure)";
             } else if (longTerm < 128) {
-                encryptionComment = "(secure until around 20XX)";
+                encryptionComment = "(secure up to 2030)";
+            } else if (longTerm < 192) {
+                encryptionComment = "(secure)";
             } else {
-                encryptionComment = "(secure for foreseeable future)";
+                encryptionComment = "(overkill)"
             }
             clinker._clinkerPopupContentSecure.textContent =
                 ("Confidentiality : ").concat(longTerm).concat(" bit ")
@@ -1445,9 +1529,11 @@ var clinker = {
             } else if (authenticationLoS < 112) {
                 authenticationComment = "(insecure)";
             } else if (authenticationLoS < 128) {
-                authenticationComment = "(secure up to around 20XX)";
+                authenticationComment = "(secure up to 2030)";
+            } else if (authenticationLoS < 192) {
+                authenticationComment = "(secure)";
             } else {
-                authenticationComment = "(secure for foreseeable future)";
+                authenticationLoS = "(overkill)";
             }
             clinker._clinkerPopupContentCertificate.textContent =
                 ("Authentication  : ").concat(authenticationLoS)
