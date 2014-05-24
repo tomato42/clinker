@@ -328,13 +328,13 @@ clinkerCryptoEstimator.prototype.getCipherLoS = function() {
 // estimate the long term security of transmitted data
 clinkerCryptoEstimator.prototype.getEncryptionLoS = function() {
     var minLoS = null;
-/*
+
     if ( this.isKeyExchangeForwardSecure ) {
-        // should be the LoS of the DH exchange, but no API yet
+        // should be the LoS of the (EC)DHE exchange, but no API yet
         // so assume it's not a weak point (it requires a targeted
         // attack anyway)
         // TODO open a RFE on bugzilla
-        minLos = 256;
+        minLos = null;
     } else {
         if (this.serverKeyType == "RSA" ||
                 this.serverKeyType == "DSA") {
@@ -343,7 +343,7 @@ clinkerCryptoEstimator.prototype.getEncryptionLoS = function() {
             minLoS = this.serverKeySize / 2;
         }
     }
-*/
+
     cipherLoS = this.getCipherLoS();
     if (minLoS == null || minLoS > cipherLoS) {
         minLoS = cipherLoS;
