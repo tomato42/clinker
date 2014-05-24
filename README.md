@@ -24,8 +24,8 @@ Usage
 
 Compress the contents of xpi folder as a zip file:
 
-  cd xpi/
-  zip -r /tmp/clinker.zip *
+    cd xpi/
+    zip -r /tmp/clinker.zip *
 
-Import to Firefox, this will install it as a extension and add an icon to the
+Import to Firefox, this will install it as an extension and add an icon to the
 address bar.
