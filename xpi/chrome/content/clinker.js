@@ -1465,31 +1465,6 @@ var clinker = {
                         && clinker_SubjectsPublicKey == "Curve"
                         && clinker_SubjectPublicKeyAlgorithm.contains("SHA-1") ) {
                             estimator.setSigHash("SHA1");
-                    } else if (clinker_SubjectPublicKeyAlgorithm.indexOf("SHA")
-                        && parseInt(clinker_SubjectsPublicKey) > 2047
-                        && clinker_SubjectPublicKeyAlgorithm.contains("SHA-1")) {
-                            estimator.setSigHash("SHA1");
-                    }
-
-                    // grade the stength of the certificate authorities hashes
-                    if (clinker_CertificateSignatureAlgrithm.indexOf("SHA")
-                        && clinker_CertificateSignatureValue[4] == "Curve"
-                        && (clinker_CertificateSignatureAlgrithm.contains("SHA-256")
-                            || clinker_CertificateSignatureAlgrithm
-                            .contains("SHA-512"))
-                        ) {
-                    } else if (clinker_CertificateSignatureAlgrithm.indexOf("SHA")
-                        && parseInt(clinker_CertificateSignatureValue[4]) > 2047
-                        && (clinker_CertificateSignatureAlgrithm.contains("SHA-256")
-                            || clinker_CertificateSignatureAlgrithm
-                            .contains("SHA-512"))
-                        ) {
-                    } else if (clinker_CertificateSignatureAlgrithm.indexOf("SHA")
-                        && clinker_CertificateSignatureValue[4] == "Curve"
-                        && clinker_CertificateSignatureAlgrithm.contains("SHA-1")) {
-                    } else if (clinker_CertificateSignatureAlgrithm.indexOf("SHA")
-                        && parseInt(clinker_CertificateSignatureValue[4]) > 2047
-                        && clinker_CertificateSignatureAlgrithm.contains("SHA-1")) {
                     }
 
                 }
