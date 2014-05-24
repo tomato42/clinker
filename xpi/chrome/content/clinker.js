@@ -32,8 +32,6 @@ var clinkerCryptoEstimator = function() {
     this.serverCurveName = null;
     // lowest level of security of keys in cert chain
     this.lowestCertKeyLoS = null;
-    // weakest algorithm type used in certificates (MD5, SHA-1, SHA-256, etc.)
-    this.lowestSignatureLoS = null;
     // information about key size in certificate
     this.certChainSize = [];
     // information about the type/algorithm (RSA, ECDSA, DSA)
@@ -228,18 +226,6 @@ clinkerCryptoEstimator.prototype.hashSecurityEstimator = function(val) {
         return 256;
     } else {
         return 0;
-    }
-}
-
-clinkerCryptoEstimator.prototype.setSigHash = function(val) {
-    if (this.lowestSignatureLoS == null) {
-        this.lowestSignatureLoS = this.hashSecurityEstimator(val);
-        return;
-    }
-
-    var newLoS = this.hashSecurityEstimator(val);
-    if (this.lowestSignatureLoS > newLoS) {
-        this.lowestSignatureLoS = newLoS;
     }
 }
 
@@ -1444,27 +1430,6 @@ var clinker = {
                                         clinker_SubjectsCertificateLocation[i]
                                         .replace(/C =/g,'');
                             }
-                    }
-
-                    // grade the stength of the subject certificates hashes
-                    if (clinker_SubjectPublicKeyAlgorithm.indexOf("SHA")
-                        && clinker_SubjectsPublicKey == "Curve"
-                        && ( clinker_SubjectPublicKeyAlgorithm.contains("SHA-256")
-                            || clinker_SubjectPublicKeyAlgorithm
-                            .contains("SHA-512"))
-                        ) {
-                            estimator.setSigHash("SHA256");
-                    } else if (clinker_SubjectPublicKeyAlgorithm.indexOf("SHA")
-                        && parseInt(clinker_SubjectsPublicKey) > 2047
-                        && ( clinker_SubjectPublicKeyAlgorithm.contains("SHA-256")
-                            || clinker_SubjectPublicKeyAlgorithm
-                            .contains("SHA-512"))
-                        ) {
-                            estimator.setSigHash("SHA256");
-                    } else if (clinker_SubjectPublicKeyAlgorithm.indexOf("SHA")
-                        && clinker_SubjectsPublicKey == "Curve"
-                        && clinker_SubjectPublicKeyAlgorithm.contains("SHA-1") ) {
-                            estimator.setSigHash("SHA1");
                     }
 
                 }
