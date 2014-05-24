@@ -1380,7 +1380,6 @@ var clinker = {
                     var certificatesAll = cc["@mozilla.org/security/nsASN1Tree;1"]
                         .createInstance(ci.nsIASN1Tree);
                     certificatesAll.loadASN1Structure(serverCert.ASN1Structure);
-                    var clinker_SubjectPublicKeyStrength = "";
                     var clinker_CertificateSignatureStrength = "";
                     var clinker_SubjectPublicKeyAlgorithm =
                         certificatesAll.getDisplayData(4).replace(/PKCS #1/g,'')
@@ -1455,7 +1454,6 @@ var clinker = {
                             || clinker_SubjectPublicKeyAlgorithm
                             .contains("SHA-512"))
                         ) {
-                            clinker_SubjectPublicKeyStrength = " (10/10)";
                             estimator.setSigHash("SHA256");
                     } else if (clinker_SubjectPublicKeyAlgorithm.indexOf("SHA")
                         && parseInt(clinker_SubjectsPublicKey) > 2047
@@ -1463,23 +1461,16 @@ var clinker = {
                             || clinker_SubjectPublicKeyAlgorithm
                             .contains("SHA-512"))
                         ) {
-                            clinker_SubjectPublicKeyStrength = " (10/10)";
                             estimator.setSigHash("SHA256");
                     } else if (clinker_SubjectPublicKeyAlgorithm.indexOf("SHA")
                         && clinker_SubjectsPublicKey == "Curve"
                         && clinker_SubjectPublicKeyAlgorithm.contains("SHA-1") ) {
-                            clinker_SubjectPublicKeyStrength = " (4/10)";
                             estimator.setSigHash("SHA1");
                     } else if (clinker_SubjectPublicKeyAlgorithm.indexOf("SHA")
                         && parseInt(clinker_SubjectsPublicKey) > 2047
                         && clinker_SubjectPublicKeyAlgorithm.contains("SHA-1")) {
-                            clinker_SubjectPublicKeyStrength = " (4/10)";
                             estimator.setSigHash("SHA1");
-                    } else {
-                        clinker_SubjectPublicKeyStrength = " (0/10)";
                     }
-                    //estimator.setServerKey("RSA",
-                    //    parseInt(clinker_SubjectsPublicKey));
 
                     // grade the stength of the certificate authorities hashes
                     if (clinker_CertificateSignatureAlgrithm.indexOf("SHA")
