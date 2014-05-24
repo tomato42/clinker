@@ -133,15 +133,31 @@ clinkerCryptoEstimator.prototype.setServerCertificate = function(clinker_cert) {
         var certLoS = null;
         if (cert_chain.hasMoreElements()) {
             certLoS = this.getCertLoS(certAlg, keySize, certHash);
-            this.certChainLabels[count] = certOrg + " [" + keySize + " bit " +
-                certAlg + ", " + certHash + "] (" + certLoS + " bit)";
+            this.certChainLabels[count] = String(
+                    String(certOrg +
+                        "                        ").slice(0,19) +
+                    " [" +
+                    keySize +
+                    " bit " +
+                    certAlg +
+                    ", " +
+                    certHash +
+                    "]" +
+                    "                                          ").slice(0,43) +
+                " (" + certLoS + " bit)";
 
         } else {
             // last certificate must be in cert store, that means its
             // hash is as secure as the cert store, so we can assume sha512
             certLoS = this.getCertLoS(certAlg, keySize, "SHA512");
-            this.certChainLabels[count] = certOrg + " [" + keySize + " bit " +
-                certAlg + "] (" + certLoS + " bit)";
+            this.certChainLabels[count] = String(
+                    String(certOrg +
+                        "                          ").slice(0,19) +
+                    " [" +
+                    keySize +
+                    " bit " + certAlg + "]" +
+                    "                                          ").slice(0,43) +
+                " (" + certLoS + " bit)";
         }
 
         count=count+1;
@@ -1357,7 +1373,7 @@ var clinker = {
               var symetricKeyLength = status.secretKeyLength;
             }
 
-            // popup the ssl information if the connection is properly encrypted
+            // popup the ssl information if the connection is encrypted
             if (symetricCipher && symetricKeyLength ) {
 
                 // parse ciphersuite used by connection
