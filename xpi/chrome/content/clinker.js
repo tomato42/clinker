@@ -27,8 +27,6 @@ var clinkerCryptoEstimator = function() {
     this.serverKeySize = null;
     // in case of ECDSA: name of curve used
     this.serverCurveName = null;
-    // lowest level of security of keys in cert chain
-    this.lowestCertKeyLoS = null;
     // information about key size in certificate
     this.certChainSize = [];
     // information about the type/algorithm (RSA, ECDSA, DSA)
@@ -266,24 +264,9 @@ clinkerCryptoEstimator.prototype.rsaLoSEstimator = function(val) {
     return keyLoS;
 }
 
-clinkerCryptoEstimator.prototype.addCertKey = function(type, size) {
-    var keyLoS;
-    if (type == "ECDSA") {
-        keyLoS = size / 2;
-    } else if (type == "RSA" || type == "DSA") {
-       keyLoS = this.rsaLoSEstimator(size);
-    }
-
-    if (this.lowestCertKeyLoS == null || this.lowestCertKeyLoS > keyLoS) {
-        this.lowestCertKeyLoS = keyLoS;
-    }
-    return;
-}
-
 clinkerCryptoEstimator.prototype.setServerKey = function(type, size) {
     this.serverKeyType = type;
     this.serverKeySize = size;
-    this.addCertKey(type, size);
 }
 
 clinkerCryptoEstimator.prototype.getServerKeyLoS = function() {
