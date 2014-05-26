@@ -38,7 +38,7 @@ var clinkerCryptoEstimator = function() {
 clinkerCryptoEstimator.prototype.setServerCertificate = function(clinker_cert) {
     var cert_chain = clinker_cert.getChain().enumerate();
 
-    count=0
+    var count=0
     while (cert_chain.hasMoreElements()) {
         var cert = cert_chain.getNext().QueryInterface(Ci.nsIX509Cert2);
 
@@ -332,7 +332,7 @@ clinkerCryptoEstimator.prototype.getEncryptionLoS = function() {
         // so assume it's not a weak point (it requires a targeted
         // attack anyway)
         // TODO open a RFE on bugzilla
-        minLos = null;
+        minLoS = null;
     } else {
         if (this.serverKeyType == "RSA" ||
                 this.serverKeyType == "DSA") {
@@ -342,7 +342,7 @@ clinkerCryptoEstimator.prototype.getEncryptionLoS = function() {
         }
     }
 
-    cipherLoS = this.getCipherLoS();
+    var cipherLoS = this.getCipherLoS();
     if (minLoS == null || minLoS > cipherLoS) {
         minLoS = cipherLoS;
     }
