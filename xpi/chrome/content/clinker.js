@@ -38,7 +38,7 @@ var clinkerCryptoEstimator = function() {
 clinkerCryptoEstimator.prototype.setServerCertificate = function(clinker_cert) {
     var cert_chain = clinker_cert.getChain().enumerate();
 
-    count=0
+    var count=0
     while (cert_chain.hasMoreElements()) {
         var cert = cert_chain.getNext().QueryInterface(Ci.nsIX509Cert2);
 
@@ -1304,7 +1304,7 @@ var clinker = {
                 var clinker_ssl_cert = status.serverCert;
                 if (!(clinker_ssl_cert)) return;
 
-                count = estimator.setServerCertificate(clinker_ssl_cert);
+                estimator.setServerCertificate(clinker_ssl_cert);
 
                 var clinker_date_validity =
                     clinker_ssl_cert.validity
@@ -1316,7 +1316,7 @@ var clinker = {
                 // does the url hostname and certificate common name match?
                 var clinker_hosts_match = " (DOMAIN MISMATCH!)";
                 if (! clinker_ssl_cert.isDomainMismatch) {
-                    clinker_hosts_match = " (matched) " + count;
+                    clinker_hosts_match = " (matched) ";
                 }
 
                 // print out the certificate info
