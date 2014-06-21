@@ -1155,7 +1155,7 @@ var clinker = {
             .getService(ci.nsIPrefBranch);
 
         // initilize the popup window
-        const clinker_current_greeting = "version 0.0.1";
+        const clinker_current_greeting = "version 0.0.2";
         clinker._clinkerPopupContentSecure.textContent =
             clinker_current_greeting;
         clinker._clinkerPopupContentCurrentDate.textContent = (new Date());
@@ -1221,7 +1221,7 @@ var clinker = {
 
         // CURRENT VERSION
         const clinker_current_version = 1;
-        const clinker_current_greeting = "version 0.0.1";
+        const clinker_current_greeting = "version 0.0.2";
 
         // global constants
         const cc = Components.classes;
