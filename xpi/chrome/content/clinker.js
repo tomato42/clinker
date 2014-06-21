@@ -248,7 +248,10 @@ clinkerCryptoEstimator.prototype.rsaLoSEstimator = function(val) {
     // the difference in complexity of attack on RSA primes of
     // n and n-10 bit size are minimal and certificates that use
     // nonstandard sizes are quite common, so average the sizes
-    if (val < 1020) { // 1024 == 80 bit
+    // 512 == 40 bit LoS
+    if (val < 760) { // 768 == 64 bit LoS
+        keyLoS = 40;
+    } else if (val < 1020) { // 1024 == 80 bit
         keyLoS = 64;
     } else if (val < 2040) { // 2048 == 112 bit
         keyLoS = 80;

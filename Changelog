@@ -7,6 +7,7 @@
  * Fix handling of SHA-384 and SHA-512 RSA signatures in certificates
  * Make red icon mean "very bad" and orange mean "not catastrophic"
  * Fix bug with "undefined" string in Common Name line
+ * Add level of security estimate for 512 bit RSA
 
  Version 0.0.1 (2014-05-24)
 
