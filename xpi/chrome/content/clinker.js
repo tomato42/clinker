@@ -1425,8 +1425,8 @@ var clinker = {
                 && estimator.getAuthenticationLoS() >= 112 ) {
                     document.getElementById("clinker-urlicon")
                         .image="chrome://clinker/skin/clinker_blue_button.png";
-            } else if (estimator.getEncryptionLoS() >= 112
-                && estimator.getAuthenticationLoS() >= 112) {
+            } else if (estimator.getEncryptionLoS() >= 80
+                && estimator.getAuthenticationLoS() >= 80) {
                     document.getElementById("clinker-urlicon").image=
                         "chrome://clinker/skin/clinker_yellow_button.png";
             } else {
