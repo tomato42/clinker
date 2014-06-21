@@ -98,6 +98,10 @@ clinkerCryptoEstimator.prototype.setServerCertificate = function(clinker_cert) {
                 certHash = "SHA224";
             } else if (tmp.indexOf("SHA-256") >= 0) {
                 certHash = "SHA256";
+            } else if (tmp.indexOf("SHA-384") >= 0) {
+                certHash = "SHA384";
+            } else if (tmp.indexOf("SHA-512") >= 0) {
+                certHash = "SHA512";
                 // ECDSA signatures are not translated by FF
             } else if (tmp.indexOf("1 2 840 10045 4 1") >= 0) {
                 certHash = "SHA1";
