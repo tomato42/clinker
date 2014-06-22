@@ -2,7 +2,7 @@
  Clinker changes
  ---------------
 
- Version 0.0.2 ()
+ Version 0.0.2 (2014-06-22)
 
  * Fix handling of SHA-384 and SHA-512 RSA signatures in certificates
  * Make red icon mean "very bad" and orange mean "not catastrophic"
